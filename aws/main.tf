@@ -27,8 +27,8 @@ resource "aws_api_gateway_resource" "rentals_resource" {
 
 resource "aws_lambda_function" "retrieve_rentals_lambda" {
   function_name = "retrieve-rentals"
-  role          = aws_iam_role.lambda_role.arn
-  handler       = "retrieve_rentals"
+  role          = aws_iam_role.retrieve_rentals_lambda_role.arn
+  handler       = "main"
   runtime = "go1.x"
   filename      = "retrieve_rentals.zip"
 
@@ -38,4 +38,25 @@ resource "aws_lambda_function" "retrieve_rentals_lambda" {
       KEY2 = "VALUE2"
     }
   }
+}
+
+# Roles
+
+resource "aws_iam_role" "retrieve_rentals_lambda_role" {
+  name = "retrieve-rentals-lambda-role"  # Replace with your desired IAM role name
+
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "lambda.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+EOF
 }
