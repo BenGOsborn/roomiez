@@ -13,7 +13,7 @@ import (
 
 func TestMain(t *testing.T) {
 
-	t.Run("Process Rental 1", func(t *testing.T) {
+	t.Run("Seed data", func(t *testing.T) {
 		if os.Getenv("ENV") != "production" {
 			if err := godotenv.Load("../../.env"); err != nil {
 				fmt.Println(err)
@@ -28,6 +28,7 @@ func TestMain(t *testing.T) {
 			t.FailNow()
 		}
 
+		// Initialize tables
 		if err := db.AutoMigrate(&utils.Rental{}); err != nil {
 			fmt.Println(err)
 			t.FailNow()
@@ -56,6 +57,58 @@ func TestMain(t *testing.T) {
 		if err := db.AutoMigrate(&utils.Tenant{}); err != nil {
 			fmt.Println(err)
 			t.FailNow()
+		}
+
+		// Create seed data
+		if res := db.Create(&utils.RentalType{Type: "Apartment"}); res.Error != nil {
+			fmt.Println(res.Error)
+		}
+		if res := db.Create(&utils.RentalType{Type: "House"}); res.Error != nil {
+			fmt.Println(res.Error)
+		}
+
+		if res := db.Create(&utils.Gender{Preference: "Male"}); res.Error != nil {
+			fmt.Println(res.Error)
+		}
+		if res := db.Create(&utils.Gender{Preference: "Female"}); res.Error != nil {
+			fmt.Println(res.Error)
+		}
+
+		if res := db.Create(&utils.Age{Preference: "Young"}); res.Error != nil {
+			fmt.Println(res.Error)
+		}
+		if res := db.Create(&utils.Age{Preference: "Middle Aged"}); res.Error != nil {
+			fmt.Println(res.Error)
+		}
+		if res := db.Create(&utils.Age{Preference: "Old"}); res.Error != nil {
+			fmt.Println(res.Error)
+		}
+
+		if res := db.Create(&utils.Duration{Preference: "Short Term"}); res.Error != nil {
+			fmt.Println(res.Error)
+		}
+		if res := db.Create(&utils.Duration{Preference: "Long Term"}); res.Error != nil {
+			fmt.Println(res.Error)
+		}
+
+		if res := db.Create(&utils.Tenant{Preference: "Singles"}); res.Error != nil {
+			fmt.Println(res.Error)
+		}
+		if res := db.Create(&utils.Tenant{Preference: "Couples"}); res.Error != nil {
+			fmt.Println(res.Error)
+		}
+
+		if res := db.Create(&utils.Feature{Name: "Garage"}); res.Error != nil {
+			fmt.Println(res.Error)
+		}
+		if res := db.Create(&utils.Feature{Name: "WiFi"}); res.Error != nil {
+			fmt.Println(res.Error)
+		}
+		if res := db.Create(&utils.Feature{Name: "Bills Included"}); res.Error != nil {
+			fmt.Println(res.Error)
+		}
+		if res := db.Create(&utils.Feature{Name: "Furnished"}); res.Error != nil {
+			fmt.Println(res.Error)
 		}
 	})
 }
