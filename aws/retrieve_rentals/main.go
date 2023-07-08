@@ -11,7 +11,8 @@ import (
 func HandleRequest(ctx context.Context) (events.APIGatewayProxyResponse, error) {
 	responseBody := "Hello, world!"
 	headers := map[string]string{
-		"Content-Type": "text/plain",
+		"Content-Type":                "text/plain",
+		"Access-Control-Allow-Origin": "*",
 	}
 
 	response := events.APIGatewayProxyResponse{
