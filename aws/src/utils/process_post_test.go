@@ -2,7 +2,6 @@ package utils_test
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"reflect"
 	"testing"
@@ -98,16 +97,13 @@ func TestProcessPost(t *testing.T) {
 		}
 	})
 
-	t.Run("Standard Good Post", func(t *testing.T) {
-		llm, err := openai.New(openai.WithModel("gpt-4"))
+	t.Run("Standard Invalid Post", func(t *testing.T) {
+		post := `Hi! I'm looking for a 2 bedroom furnished apartment or a bedroom for 2 people in a shared house/flat. Ideally in the city, or suburbs near the city (Potts Point, Surry hills…), bondi, Randwick or coogee.
+		We have a good realtor as a reference. We are tidy, clean and not party people.
+		Please DM me if you have one for long term rent.`
 
-		if err != nil {
-			fmt.Println(err)
-			t.FailNow()
+		if _, err := utils.ProcessPost(ctx, llm, post); err == nil {
+			t.Error(err)
 		}
-
-		// post := ``
-
-		fmt.Println(llm, ctx)
 	})
 }

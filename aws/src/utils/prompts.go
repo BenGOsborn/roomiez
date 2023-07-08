@@ -140,8 +140,7 @@ func NewPostExtraction(llm *openai.Chat) *chains.LLMChain {
 		"tenant": "Singles",
 		"features": [
 			"Bills Included",
-			"WiFi",
-			"Furnished"
+			"WiFi"
 		]
 	}	
 
