@@ -6,7 +6,7 @@ import (
 
 type Rental struct {
 	gorm.Model
-	Post         string `gorm:"unique"`
+	PostHash     string `gorm:"unique"`
 	Price        *int
 	Latitude     *int
 	Longitude    *int
