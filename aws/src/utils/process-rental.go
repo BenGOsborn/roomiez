@@ -57,6 +57,6 @@ type RentalSchema struct {
 }
 
 // Process a post
-func ProcessRental(rentalPost string, url string) {
-
+func ProcessRental(rentalPost string) (*RentalSchema, error) {
+	return nil, nil
 }
