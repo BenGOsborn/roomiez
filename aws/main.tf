@@ -128,9 +128,3 @@ resource "aws_iam_role_policy_attachment" "lambda_secrets_manager_policy" {
   role       = aws_iam_role.lambda_role.name
   policy_arn = aws_iam_policy.secrets_manager_policy.arn
 }
-
-# SQS
-
-resource "aws_sqs_queue" "rentals_queue" {
-  name = "rentals-queue"
-}
