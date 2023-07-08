@@ -3,6 +3,7 @@ package utils
 import (
 	"context"
 	"encoding/json"
+	"errors"
 
 	"github.com/tmc/langchaingo/chains"
 	"github.com/tmc/langchaingo/llms/openai"
@@ -55,6 +56,7 @@ const (
 
 type RentalSchema struct {
 	Price      *int              `json:"price"`
+	Bond       *int              `json:"bond"`
 	Location   *string           `json:"location"`
 	RentalType *RentalTypeSchema `json:"rentalType"`
 	Gender     *GenderSchema     `json:"gender"`
@@ -64,16 +66,27 @@ type RentalSchema struct {
 	Features   []FeatureSchema   `json:"features"`
 }
 
+func (r *RentalSchema) String() string {
+	data, err := json.Marshal(r)
+	if err != nil {
+		panic(err)
+	}
+
+	return string(data)
+}
+
 // Extract all data from a post
-func ProcessPost(ctx context.Context, llm *openai.LLM, post string) (*RentalSchema, error) {
+func ProcessPost(ctx context.Context, llm *openai.Chat, post string) (*RentalSchema, error) {
 	validationChain := NewPostValidation(llm)
-	validation, err := chains.Run(ctx, validationChain, post)
-	if err != nil || validation != "yes" {
+	validation, err := chains.Run(ctx, validationChain, post, chains.WithTemperature(0.4))
+	if err != nil {
 		return nil, err
+	} else if validation != "yes" {
+		return nil, errors.New("invalid post")
 	}
 
 	extractionChain := NewPostExtraction(llm)
-	rawData, err := chains.Run(ctx, extractionChain, post)
+	rawData, err := chains.Run(ctx, extractionChain, post, chains.WithTemperature(0.4))
 	if err != nil {
 		return nil, err
 	}

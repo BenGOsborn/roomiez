@@ -8,6 +8,7 @@ type Rental struct {
 	gorm.Model
 	PostHash     string `gorm:"unique"`
 	Price        *int
+	Bond         *int
 	Latitude     *int
 	Longitude    *int
 	RentalTypeID *uint

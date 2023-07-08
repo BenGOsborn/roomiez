@@ -7,7 +7,7 @@ import (
 )
 
 // Create a prompt for a post validation
-func NewPostValidation(llm *openai.LLM) *chains.LLMChain {
+func NewPostValidation(llm *openai.Chat) *chains.LLMChain {
 	prompt := prompts.NewPromptTemplate(`Please return 'yes' if the following post is advertising a shared rental property, and 'no' if otherwise. Some examples have been provided below to give you context.
 	For example, if the post is advertising a shared rental property the output should be yes.
 	If the post indicates someone is looking for a shared rental property the output should be no.
@@ -48,14 +48,16 @@ func NewPostValidation(llm *openai.LLM) *chains.LLMChain {
 }
 
 // Create a prompt for post data extraction
-func NewPostExtraction(llm *openai.LLM) *chains.LLMChain {
+func NewPostExtraction(llm *openai.Chat) *chains.LLMChain {
 	prompt := prompts.NewPromptTemplate(`Given the following post, please extract the information and format it as a JSON object that strictly follows the schema described below. Ensure that each extracted field corresponds to its respective field in the schema.
 	For example, if the post contains information about the price, assign the extracted price to the "price" field in the JSON object.
+	Please note that 'Young' is classified as anyone between 18 and 35 years old, 'Middle Aged' is anyone between 36 and 55 years old, and 'Old' is anyone older than 56.
 	Your response should be a JSON string on a new line after "Output:".
 
 	JSON Schema:
 	type RentalSchema = {
 		price?: number | null;
+		bond?: number | null;
 		location?: string | null;
 		rentalType?: "Apartment" | "House" | null;
 		gender?: "Male" | "Female" | null;
@@ -71,7 +73,7 @@ func NewPostExtraction(llm *openai.LLM) *chains.LLMChain {
 
 	Post:
 	LIVE BY THE BEACH, Maroubra
-	Short term room for rent, $300/week includ bills 
+	Short term room for rent, $300/week includ bills, bond $1080
 	Looking for a girl to live with us from 
 	Saturday July 15th - August 26th 
 	$300/week including bills (electricity, gas and wifi) 
@@ -86,6 +88,7 @@ func NewPostExtraction(llm *openai.LLM) *chains.LLMChain {
 	Output:
 	{
 		"price": 300,
+		"bond": 1080,
 		"location": "Maroubra",
 		"rentalType": "House",
 		"gender": "Female",
@@ -128,6 +131,7 @@ func NewPostExtraction(llm *openai.LLM) *chains.LLMChain {
 	Output:
 	{
 		"price": 480,
+		"bond": null,
 		"location": "Sydney Olympic Park",
 		"rentalType": "Apartment",
 		"gender": null,
