@@ -62,7 +62,7 @@ resource "aws_api_gateway_integration" "lambda_integration" {
 resource "aws_api_gateway_method" "rentals_post_method" {
   rest_api_id   = aws_api_gateway_rest_api.rest_api.id
   resource_id   = aws_api_gateway_resource.rentals_resource.id
-  http_method   = "GET"
+  http_method   = "POST"
   authorization = "NONE"
 }
 
@@ -127,4 +127,10 @@ resource "aws_iam_policy" "secrets_manager_policy" {
 resource "aws_iam_role_policy_attachment" "lambda_secrets_manager_policy" {
   role       = aws_iam_role.lambda_role.name
   policy_arn = aws_iam_policy.secrets_manager_policy.arn
+}
+
+# SQS
+
+resource "aws_sqs_queue" "rentals_queue" {
+  name = "rentals-queue"
 }
