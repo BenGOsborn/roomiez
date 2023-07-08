@@ -88,6 +88,7 @@ resource "aws_lambda_function" "retrieve_rentals_lambda" {
   environment {
     variables = {
       SECRETS = aws_secretsmanager_secret.secrets.arn
+      ENV     = "production"
     }
   }
 }
@@ -103,6 +104,7 @@ resource "aws_lambda_function" "process_rental_lambda" {
   environment {
     variables = {
       SECRETS = aws_secretsmanager_secret.secrets.arn
+      ENV     = "production"
     }
   }
 }

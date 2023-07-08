@@ -1,59 +1,60 @@
 package utils
 
 import (
-	"time"
-
 	"gorm.io/gorm"
 )
 
 type Rental struct {
 	gorm.Model
-	Post          string `gorm:"unique"`
-	Price         *int
-	Latitude      *int
-	Longitude     *int
-	AvailableFrom *time.Time
-	AvailableTo   *time.Time
-	Features      []Feature `gorm:"many2many:user_languages;"`
+	Post         string `gorm:"unique"`
+	Price        *int
+	Latitude     *int
+	Longitude    *int
+	RentalTypeID *uint
+	GenderID     *uint
+	AgeID        *uint
+	DurationID   *uint
+	TenantID     *uint
+	Features     []Feature `gorm:"many2many:user_languages;"`
 }
 
 // Apartment, house, granny flat
 type RentalType struct {
 	gorm.Model
-	Type    string
+	Type    string `gorm:"unique"`
 	Rentals []Rental
 }
 
 // Male, female, all
 type Gender struct {
 	gorm.Model
-	Preference string
+	Preference string `gorm:"unique"`
 	Rentals    []Rental
 }
 
 // Young, middle aged, old
 type Age struct {
 	gorm.Model
-	Preference string
+	Preference string `gorm:"unique"`
 	Rentals    []Rental
 }
 
 // Short term, long term, all
 type Duration struct {
 	gorm.Model
-	Preference string
+	Preference string `gorm:"unique"`
 	Rentals    []Rental
 }
 
 // Singles, couples, all
 type Tenant struct {
 	gorm.Model
-	Preference string
+	Preference string `gorm:"unique"`
 	Rentals    []Rental
 }
 
 // e.g. garage, bills included, furnished, wifi
 type Feature struct {
 	gorm.Model
-	Name string
+	Name string `gorm:"unique"`
 }
