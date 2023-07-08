@@ -1,5 +1,13 @@
 package utils
 
+import (
+	"context"
+	"encoding/json"
+
+	"github.com/tmc/langchaingo/chains"
+	"github.com/tmc/langchaingo/llms/openai"
+)
+
 type RentalTypeSchema string
 
 const (
@@ -56,7 +64,24 @@ type RentalSchema struct {
 	Features   []FeatureSchema   `json:"features"`
 }
 
-// Process a post
-func ProcessRental(rentalPost string) (*RentalSchema, error) {
-	return nil, nil
+// Extract all data from a post
+func ProcessPost(ctx context.Context, llm *openai.LLM, post string) (*RentalSchema, error) {
+	validationChain := NewPostValidation(llm)
+	validation, err := chains.Run(ctx, validationChain, post)
+	if err != nil || validation != "yes" {
+		return nil, err
+	}
+
+	extractionChain := NewPostExtraction(llm)
+	rawData, err := chains.Run(ctx, extractionChain, post)
+	if err != nil {
+		return nil, err
+	}
+
+	rental := &RentalSchema{}
+	if err := json.Unmarshal([]byte(rawData), rental); err != nil {
+		return nil, err
+	}
+
+	return rental, nil
 }
