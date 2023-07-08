@@ -50,7 +50,7 @@ resource "aws_api_gateway_method" "rentals_get_method" {
   authorization = "NONE"
 }
 
-resource "aws_api_gateway_integration" "lambda_integration" {
+resource "aws_api_gateway_integration" "rentals_get_lambda_integration" {
   rest_api_id             = aws_api_gateway_rest_api.rest_api.id
   resource_id             = aws_api_gateway_resource.rentals_resource.id
   http_method             = aws_api_gateway_method.rentals_get_method.http_method
@@ -64,6 +64,15 @@ resource "aws_api_gateway_method" "rentals_post_method" {
   resource_id   = aws_api_gateway_resource.rentals_resource.id
   http_method   = "POST"
   authorization = "NONE"
+}
+
+resource "aws_api_gateway_integration" "rentals_post_lambda_integration" {
+  rest_api_id             = aws_api_gateway_rest_api.rest_api.id
+  resource_id             = aws_api_gateway_resource.rentals_resource.id
+  http_method             = aws_api_gateway_method.rentals_post_method.http_method
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = aws_lambda_function.process_rental_lambda.invoke_arn
 }
 
 # Lambda
@@ -83,12 +92,35 @@ resource "aws_lambda_function" "retrieve_rentals_lambda" {
   }
 }
 
+resource "aws_lambda_function" "process_rental_lambda" {
+  function_name    = "process-rentals"
+  role             = aws_iam_role.lambda_role.arn
+  handler          = "main"
+  runtime          = "go1.x"
+  filename         = "process_rental.zip"
+  source_code_hash = filebase64sha256("process_rental.zip")
+
+  environment {
+    variables = {
+      SECRETS = aws_secretsmanager_secret.secrets.arn
+    }
+  }
+}
+
 resource "aws_lambda_permission" "apigw_retrieve_rentals_lambda_permission" {
   statement_id  = "AllowAPIGatewayInvoke"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.retrieve_rentals_lambda.function_name
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_api_gateway_rest_api.rest_api.execution_arn}/*/${aws_api_gateway_method.rentals_get_method.http_method}${aws_api_gateway_resource.rentals_resource.path}"
+}
+
+resource "aws_lambda_permission" "apigw_process_rental_lambda_permission" {
+  statement_id  = "AllowAPIGatewayInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.process_rental_lambda.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.rest_api.execution_arn}/*/${aws_api_gateway_method.rentals_post_method.http_method}${aws_api_gateway_resource.rentals_resource.path}"
 }
 
 # Roles
