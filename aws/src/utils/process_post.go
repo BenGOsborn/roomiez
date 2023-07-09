@@ -2,11 +2,15 @@ package utils
 
 import (
 	"context"
+	"crypto/md5"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
+	"fmt"
 
 	"github.com/tmc/langchaingo/chains"
 	"github.com/tmc/langchaingo/llms/openai"
+	"gorm.io/gorm"
 
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/location"
@@ -135,4 +139,15 @@ func CoordsFromAddress(ctx context.Context, address string, placeIndexName strin
 	longitude := place.Geometry.Point[0]
 
 	return latitude, longitude, nil
+}
+
+// Save rental to database
+func CreateRental(db *gorm.DB, post string) error {
+	hash := md5.New()
+	hash.Write([]byte(post))
+	hashString := hex.EncodeToString(hash.Sum(nil))
+
+	fmt.Printf("hashString: %v\n", hashString)
+
+	return nil
 }
