@@ -7,10 +7,9 @@ import (
 type Rental struct {
 	gorm.Model
 	PostHash     string `gorm:"unique"`
+	Coordinates  *string
 	Price        *int
 	Bond         *int
-	Latitude     *int
-	Longitude    *int
 	RentalTypeID *uint
 	GenderID     *uint
 	AgeID        *uint
