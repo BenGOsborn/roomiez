@@ -2,12 +2,15 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 	"strconv"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/bengosborn/roomiez/aws/utils"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 )
 
 const (
@@ -16,18 +19,31 @@ const (
 
 func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
 	// Load requirements
-	// env, err := utils.LoadEnv(ctx)
-	// if err != nil {
-	// 	return nil, err
-	// }
+	env, err := utils.LoadEnv(ctx)
+	if err != nil {
+		return nil, err
+	}
 
-	// db, err := gorm.Open(mysql.Open(env.DSN))
-	// if err != nil {
-	// 	return nil, err
-	// }
+	db, err := gorm.Open(mysql.Open(env.DSN))
+	if err != nil {
+		return nil, err
+	}
 
-	// Make search query
-	// searchParams := ParseQueryString(&request.MultiValueQueryStringParameters)
+	// Seach for rentals
+	searchParams, err := ParseQueryString(&request.MultiValueQueryStringParameters)
+	if err != nil {
+		return nil, err
+	}
+
+	rentals, err := utils.SearchRentals(db, searchParams, PageSize)
+	if err != nil {
+		return nil, err
+	}
+
+	body, err := json.Marshal(rentals)
+	if err != nil {
+		return nil, err
+	}
 
 	return &events.APIGatewayProxyResponse{
 		StatusCode: http.StatusOK,
@@ -35,7 +51,7 @@ func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 			"Content-Type":                "application/json",
 			"Access-Control-Allow-Origin": "*",
 		},
-		Body: "Hello world",
+		Body: string(body),
 	}, nil
 }
 
@@ -44,7 +60,7 @@ func ParseQueryString(queryString *map[string][]string) (*utils.SearchParams, er
 	searchParams := &utils.SearchParams{Page: 1}
 
 	if latitude, ok := (*queryString)["latitude"]; ok {
-		temp, err := strconv.Atoi(latitude[0])
+		temp, err := strconv.ParseFloat(latitude[0], 64)
 		if err != nil {
 			return nil, err
 		}
@@ -53,7 +69,7 @@ func ParseQueryString(queryString *map[string][]string) (*utils.SearchParams, er
 	}
 
 	if longitude, ok := (*queryString)["longitude"]; ok {
-		temp, err := strconv.Atoi(longitude[0])
+		temp, err := strconv.ParseFloat(longitude[0], 64)
 		if err != nil {
 			return nil, err
 		}
@@ -62,11 +78,12 @@ func ParseQueryString(queryString *map[string][]string) (*utils.SearchParams, er
 	}
 
 	if radius, ok := (*queryString)["radius"]; ok {
-		temp, err := strconv.Atoi(radius[0])
+		tmp, err := strconv.Atoi(radius[0])
 		if err != nil {
 			return nil, err
 		}
 
+		temp := uint(tmp)
 		searchParams.Radius = &temp
 	}
 
@@ -113,10 +130,15 @@ func ParseQueryString(queryString *map[string][]string) (*utils.SearchParams, er
 	}
 
 	if page, ok := (*queryString)["page"]; ok {
-		searchParams.Page = page[0]
+		temp, err := strconv.Atoi(page[0])
+		if err != nil {
+			return nil, err
+		}
+
+		searchParams.Page = uint(temp)
 	}
 
-	return searchParams
+	return searchParams, nil
 }
 
 func main() {

@@ -5,8 +5,8 @@ import (
 )
 
 type SearchParams struct {
-	Latitude   *int
-	Longitude  *int
+	Latitude   *float64
+	Longitude  *float64
 	Radius     *uint // metres
 	Price      *int
 	Bond       *int

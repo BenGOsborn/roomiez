@@ -2,7 +2,6 @@ package utils_test
 
 import (
 	"context"
-	"math"
 	"testing"
 
 	"github.com/bengosborn/roomiez/aws/utils"
@@ -46,8 +45,8 @@ func TestSearchRentals(t *testing.T) {
 	t.Run("Geo search", func(t *testing.T) {
 		var perPage uint = 1
 
-		latitude := 0
-		longitude := 0
+		latitude := 0.0
+		longitude := 0.0
 		var radius uint = 0
 
 		rentals, err := utils.SearchRentals(db, &utils.SearchParams{Page: 1, Latitude: &latitude, Longitude: &longitude, Radius: &radius}, perPage)
@@ -57,7 +56,9 @@ func TestSearchRentals(t *testing.T) {
 			t.Error("out of bounds records included")
 		}
 
-		radius = uint(math.MaxUint64)
+		longitude = -40.0
+		latitude = 160.0
+		radius = 100
 
 		rentals, err = utils.SearchRentals(db, &utils.SearchParams{Page: 1, Latitude: &latitude, Longitude: &longitude, Radius: &radius}, perPage)
 		if err != nil {
