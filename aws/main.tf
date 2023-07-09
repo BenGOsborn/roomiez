@@ -82,13 +82,14 @@ resource "aws_lambda_function" "retrieve_rentals_lambda" {
   role             = aws_iam_role.lambda_role.arn
   handler          = "main"
   runtime          = "go1.x"
+  timeout          = "30"
   filename         = "retrieve_rentals.zip"
   source_code_hash = filebase64sha256("retrieve_rentals.zip")
 
   environment {
     variables = {
-      SECRETS = aws_secretsmanager_secret.secrets.arn
-      ENV     = "production"
+      SECRETS_ARN = aws_secretsmanager_secret.secrets.arn
+      ENV         = "production"
     }
   }
 }
@@ -98,13 +99,14 @@ resource "aws_lambda_function" "process_rental_lambda" {
   role             = aws_iam_role.lambda_role.arn
   handler          = "main"
   runtime          = "go1.x"
+  timeout          = "30"
   filename         = "process_rental.zip"
   source_code_hash = filebase64sha256("process_rental.zip")
 
   environment {
     variables = {
-      SECRETS = aws_secretsmanager_secret.secrets.arn
-      ENV     = "production"
+      SECRETS_ARN = aws_secretsmanager_secret.secrets.arn
+      ENV         = "production"
     }
   }
 }
@@ -148,6 +150,7 @@ EOF
 
 data "aws_iam_policy_document" "secrets_manager_policy" {
   statement {
+    effect    = "Allow"
     actions   = ["secretsmanager:GetSecretValue"]
     resources = [aws_secretsmanager_secret.secrets.arn]
   }
@@ -161,4 +164,22 @@ resource "aws_iam_policy" "secrets_manager_policy" {
 resource "aws_iam_role_policy_attachment" "lambda_secrets_manager_policy" {
   role       = aws_iam_role.lambda_role.name
   policy_arn = aws_iam_policy.secrets_manager_policy.arn
+}
+
+data "aws_iam_policy_document" "location_policy" {
+  statement {
+    effect    = "Allow"
+    actions   = ["geo:SearchPlaceIndexForText"]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_policy" "location_policy" {
+  name   = "location-policy"
+  policy = data.aws_iam_policy_document.location_policy.json
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_location_policy" {
+  role       = aws_iam_role.lambda_role.name
+  policy_arn = aws_iam_policy.location_policy.arn
 }
