@@ -6,6 +6,7 @@ require (
 	github.com/aws/aws-lambda-go v1.41.0
 	github.com/aws/aws-sdk-go-v2/config v1.18.27
 	github.com/aws/aws-sdk-go-v2/service/location v1.25.0
+	github.com/aws/aws-sdk-go-v2/service/secretsmanager v1.19.10
 	github.com/joho/godotenv v1.5.1
 	github.com/tmc/langchaingo v0.0.0-20230707182934-41826d014d74
 	gorm.io/driver/mysql v1.5.1

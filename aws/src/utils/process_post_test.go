@@ -2,25 +2,22 @@ package utils_test
 
 import (
 	"context"
-	"os"
 	"reflect"
 	"testing"
 
 	"github.com/bengosborn/roomiez/aws/utils"
-	"github.com/joho/godotenv"
 	"github.com/tmc/langchaingo/llms/openai"
 )
 
 func TestProcessPost(t *testing.T) {
-	if os.Getenv("ENV") != "production" {
-		if err := godotenv.Load("../../.env"); err != nil {
-			t.Error(err)
-		}
-	}
-
 	ctx := context.Background()
 
-	llm, err := openai.NewChat(openai.WithModel("gpt-4"))
+	env, err := utils.LoadEnv(ctx)
+	if err != nil {
+		t.Error(err)
+	}
+
+	llm, err := openai.NewChat(openai.WithModel("gpt-4"), openai.WithToken(env.OpenAIAPIKey))
 	if err != nil {
 		t.Error(err)
 	}
@@ -110,7 +107,7 @@ func TestProcessPost(t *testing.T) {
 	t.Run("Address To Coords", func(t *testing.T) {
 		address := "Sydney Olympic Park"
 
-		latitude, longitude, err := utils.CoordsFromAddress(ctx, address, os.Getenv("AWS_LOCATION_PLACE_INDEX"))
+		latitude, longitude, err := utils.CoordsFromAddress(ctx, address, env.AWSLocationPlaceIndex)
 		if err != nil {
 			t.Error(err)
 		}
