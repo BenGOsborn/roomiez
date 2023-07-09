@@ -1,25 +1,23 @@
 package main_test
 
 import (
-	"os"
+	"context"
 	"testing"
 
 	"github.com/bengosborn/roomiez/aws/utils"
-	"github.com/joho/godotenv"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
 func TestMain(t *testing.T) {
-	if os.Getenv("ENV") != "production" {
-		if err := godotenv.Load("../../.env"); err != nil {
-			t.Error(err)
-		}
+	ctx := context.Background()
+
+	env, err := utils.LoadEnv(ctx)
+	if err != nil {
+		t.Error(err)
 	}
 
-	dsn := os.Getenv("DSN")
-
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{DisableForeignKeyConstraintWhenMigrating: true})
+	db, err := gorm.Open(mysql.Open(env.DSN), &gorm.Config{DisableForeignKeyConstraintWhenMigrating: true})
 	if err != nil {
 		t.Error(err)
 	}
