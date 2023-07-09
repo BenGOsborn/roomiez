@@ -3,47 +3,31 @@ package main
 import (
 	"context"
 	"net/http"
+	"strconv"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/bengosborn/roomiez/aws/utils"
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
 )
 
 const (
 	PageSize = 25
 )
 
-type SearchParams struct {
-	Latitude   *string
-	Longitude  *string
-	Radius     *string
-	Price      *string
-	Bond       *string
-	RentalType *string
-	Gender     *string
-	Age        *string
-	Duration   *string
-	Tenant     *string
-	Features   *[]string
-	Page       string
-}
-
 func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
 	// Load requirements
-	env, err := utils.LoadEnv(ctx)
-	if err != nil {
-		return nil, err
-	}
+	// env, err := utils.LoadEnv(ctx)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	db, err := gorm.Open(mysql.Open(env.DSN))
-	if err != nil {
-		return nil, err
-	}
+	// db, err := gorm.Open(mysql.Open(env.DSN))
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	// Make search query
-	searchParams := ParseQueryString(&request.MultiValueQueryStringParameters)
+	// searchParams := ParseQueryString(&request.MultiValueQueryStringParameters)
 
 	return &events.APIGatewayProxyResponse{
 		StatusCode: http.StatusOK,
@@ -56,27 +40,52 @@ func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 }
 
 // Parse the query string
-func ParseQueryString(queryString *map[string][]string) *SearchParams {
-	searchParams := &SearchParams{Page: "1"}
+func ParseQueryString(queryString *map[string][]string) (*utils.SearchParams, error) {
+	searchParams := &utils.SearchParams{Page: 1}
 
 	if latitude, ok := (*queryString)["latitude"]; ok {
-		searchParams.Latitude = &latitude[0]
+		temp, err := strconv.Atoi(latitude[0])
+		if err != nil {
+			return nil, err
+		}
+
+		searchParams.Latitude = &temp
 	}
 
 	if longitude, ok := (*queryString)["longitude"]; ok {
-		searchParams.Longitude = &longitude[0]
+		temp, err := strconv.Atoi(longitude[0])
+		if err != nil {
+			return nil, err
+		}
+
+		searchParams.Longitude = &temp
 	}
 
 	if radius, ok := (*queryString)["radius"]; ok {
-		searchParams.Radius = &radius[0]
+		temp, err := strconv.Atoi(radius[0])
+		if err != nil {
+			return nil, err
+		}
+
+		searchParams.Radius = &temp
 	}
 
 	if price, ok := (*queryString)["price"]; ok {
-		searchParams.Price = &price[0]
+		temp, err := strconv.Atoi(price[0])
+		if err != nil {
+			return nil, err
+		}
+
+		searchParams.Price = &temp
 	}
 
 	if bond, ok := (*queryString)["bond"]; ok {
-		searchParams.Bond = &bond[0]
+		temp, err := strconv.Atoi(bond[0])
+		if err != nil {
+			return nil, err
+		}
+
+		searchParams.Bond = &temp
 	}
 
 	if rentalType, ok := (*queryString)["rentalType"]; ok {
