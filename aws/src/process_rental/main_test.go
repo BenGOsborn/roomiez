@@ -2,8 +2,10 @@ package main_test
 
 import (
 	"context"
+	"encoding/json"
 	"testing"
 
+	"github.com/aws/aws-lambda-go/events"
 	main "github.com/bengosborn/roomiez/aws/process_rental"
 	"github.com/bengosborn/roomiez/aws/utils"
 	"gorm.io/driver/mysql"
@@ -89,7 +91,12 @@ func TestHandleRequest(t *testing.T) {
 	})
 
 	t.Run("Create post", func(t *testing.T) {
-		if _, err := main.HandleRequest(ctx, main.Event{Post: post, URL: url}); err != nil {
+		body, err := json.Marshal(&main.Body{Post: post, URL: url})
+		if err != nil {
+			t.Error(err)
+		}
+
+		if _, err := main.HandleRequest(ctx, events.APIGatewayProxyRequest{Body: string(body)}); err != nil {
 			t.Error(err)
 		}
 	})

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"net/http"
 
@@ -13,12 +14,12 @@ import (
 	"gorm.io/gorm"
 )
 
-type Event struct {
+type Body struct {
 	Post string `json:"post"`
 	URL  string `json:"url"`
 }
 
-func HandleRequest(ctx context.Context, event Event) (*events.APIGatewayProxyResponse, error) {
+func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
 	// Load requirements
 	env, err := utils.LoadEnv(ctx)
 	if err != nil {
@@ -36,20 +37,22 @@ func HandleRequest(ctx context.Context, event Event) (*events.APIGatewayProxyRes
 	}
 
 	// Process the post and ensure no duplicates
-	post := event.Post
-	url := event.URL
+	body := &Body{}
+	if err := json.Unmarshal([]byte(request.Body), body); err != nil {
+		return nil, err
+	}
 
-	if err := db.Where("url = ?", url).First(&utils.Rental{}).Error; err == nil {
+	if err := db.Where("url = ?", body.URL).First(&utils.Rental{}).Error; err == nil {
 		return nil, errors.New("post already exists")
 	}
 
-	rental, err := utils.ProcessPost(ctx, llm, post)
+	rental, err := utils.ProcessPost(ctx, llm, body.Post)
 	if err != nil {
 		return nil, err
 	}
 
 	// Save the post
-	if err := utils.SaveRental(ctx, db, rental, url, env.AWSLocationPlaceIndex); err != nil {
+	if err := utils.SaveRental(ctx, db, rental, body.URL, env.AWSLocationPlaceIndex); err != nil {
 		return nil, err
 	}
 
