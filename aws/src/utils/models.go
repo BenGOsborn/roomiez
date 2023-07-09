@@ -6,7 +6,7 @@ import (
 
 type Rental struct {
 	gorm.Model
-	PostHash     string `gorm:"uniqueIndex,varchar(255)"`
+	URL          string `gorm:"unique"`
 	Coordinates  *string
 	Price        *int
 	Bond         *int
@@ -21,40 +21,40 @@ type Rental struct {
 // Apartment, house, granny flat
 type RentalType struct {
 	gorm.Model
-	Type    string `gorm:"uniqueIndex,varchar(255)"`
+	Type    string `gorm:"unique"`
 	Rentals []Rental
 }
 
 // Male, female, all
 type Gender struct {
 	gorm.Model
-	Preference string `gorm:"uniqueIndex,varchar(255)"`
+	Preference string `gorm:"unique"`
 	Rentals    []Rental
 }
 
 // Young, middle aged, old
 type Age struct {
 	gorm.Model
-	Preference string `gorm:"uniqueIndex,varchar(255)"`
+	Preference string `gorm:"unique"`
 	Rentals    []Rental
 }
 
 // Short term, long term, all
 type Duration struct {
 	gorm.Model
-	Preference string `gorm:"uniqueIndex,varchar(255)"`
+	Preference string `gorm:"unique"`
 	Rentals    []Rental
 }
 
 // Singles, couples, all
 type Tenant struct {
 	gorm.Model
-	Preference string `gorm:"uniqueIndex,varchar(255)"`
+	Preference string `gorm:"unique"`
 	Rentals    []Rental
 }
 
 // e.g. garage, bills included, furnished, wifi
 type Feature struct {
 	gorm.Model
-	Name string `gorm:"uniqueIndex,varchar(255)"`
+	Name string `gorm:"unique"`
 }

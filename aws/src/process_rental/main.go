@@ -2,8 +2,7 @@ package main
 
 import (
 	"context"
-	"crypto/md5"
-	"encoding/hex"
+	"errors"
 	"net/http"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -16,6 +15,7 @@ import (
 
 type Event struct {
 	Post string `json:"post"`
+	URL  string `json:"url"`
 }
 
 func HandleRequest(ctx context.Context, event Event) (*events.APIGatewayProxyResponse, error) {
@@ -35,29 +35,31 @@ func HandleRequest(ctx context.Context, event Event) (*events.APIGatewayProxyRes
 		return nil, err
 	}
 
-	// Process the post
+	// Process the post and ensure no duplicates
 	post := event.Post
+	url := event.URL
 
-	hash := md5.New()
-	hash.Write([]byte(post))
-	hashString := hex.EncodeToString(hash.Sum(nil))
+	if err := db.Where("url = ?", url).First(&utils.Rental{}).Error; err == nil {
+		return nil, errors.New("post already exists")
+	}
 
-	if err := db.Where("post_hash = ?", hashString).First(&utils.Rental{}).Error; err != nil {
+	rental, err := utils.ProcessPost(ctx, llm, post)
+	if err != nil {
 		return nil, err
 	}
 
-	// Parse the post
-	rental, err := utils.ProcessPost(ctx, llm, post)
-
-	headers := map[string]string{
-		"Content-Type":                "text/plain",
-		"Access-Control-Allow-Origin": "*",
+	// Save the post
+	if err := utils.SaveRental(ctx, db, rental, url, env.AWSLocationPlaceIndex); err != nil {
+		return nil, err
 	}
 
 	return &events.APIGatewayProxyResponse{
 		StatusCode: http.StatusOK,
-		Headers:    headers,
-		Body:       "OK",
+		Headers: map[string]string{
+			"Content-Type":                "text/plain",
+			"Access-Control-Allow-Origin": "*",
+		},
+		Body: "OK",
 	}, nil
 }
 

@@ -10,7 +10,7 @@ import (
 func TestLoadEnv(t *testing.T) {
 	ctx := context.Background()
 
-	t.Run("Load Env", func(t *testing.T) {
+	t.Run("Load env", func(t *testing.T) {
 		if _, err := utils.LoadEnv(ctx); err != nil {
 			t.Error(err)
 		}

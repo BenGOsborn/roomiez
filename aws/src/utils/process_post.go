@@ -36,9 +36,9 @@ const (
 type AgeSchema string
 
 const (
-	AgeYoung       AgeSchema = "Young"
-	AggeMiddleAged AgeSchema = "Middle Aged"
-	AgeOld         AgeSchema = "Old"
+	AgeYoung      AgeSchema = "Young"
+	AgeMiddleAged AgeSchema = "Middle Aged"
+	AgeOld        AgeSchema = "Old"
 )
 
 type DurationSchema string
@@ -140,10 +140,10 @@ func CoordsFromAddress(ctx context.Context, address string, placeIndexName strin
 }
 
 // Save a rental to database
-func SaveRental(ctx context.Context, db *gorm.DB, rental *RentalSchema, hash string, placeIndexName string) error {
+func SaveRental(ctx context.Context, db *gorm.DB, rental *RentalSchema, url string, placeIndexName string) error {
 	newRental := &Rental{}
 
-	newRental.PostHash = hash
+	newRental.URL = url
 	newRental.Price = rental.Price
 	newRental.Bond = rental.Bond
 
@@ -159,6 +159,7 @@ func SaveRental(ctx context.Context, db *gorm.DB, rental *RentalSchema, hash str
 
 	if rental.RentalType != nil {
 		rentalType := &RentalType{}
+
 		if err := db.First(rentalType, "type = ?", *rental.RentalType).Error; err != nil {
 			return err
 		}

@@ -1,15 +1,16 @@
-package utils_test
+package main_test
 
 import (
 	"context"
-	"reflect"
 	"testing"
 
+	main "github.com/bengosborn/roomiez/aws/process_rental"
 	"github.com/bengosborn/roomiez/aws/utils"
-	"github.com/tmc/langchaingo/llms/openai"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 )
 
-func TestProcessPost(t *testing.T) {
+func TestHandleRequest(t *testing.T) {
 	ctx := context.Background()
 
 	env, err := utils.LoadEnv(ctx)
@@ -17,13 +18,12 @@ func TestProcessPost(t *testing.T) {
 		t.Error(err)
 	}
 
-	llm, err := openai.NewChat(openai.WithModel("gpt-4"), openai.WithToken(env.OpenAIAPIKey))
+	db, err := gorm.Open(mysql.Open(env.DSN), &gorm.Config{DisableForeignKeyConstraintWhenMigrating: true})
 	if err != nil {
 		t.Error(err)
 	}
 
-	t.Run("Standard valid post", func(t *testing.T) {
-		post := `Hello!
+	post := `Hello!
 		We have found a new place to call 'home' in beautiful Drummoyne and are now looking for a third female to join us!
 		THE PROPERTY:
 		A tastefully remodeled 3-bedroom apartment located in a well-maintained building, featuring a unique townhouse-style layout spread across two floors.
@@ -58,12 +58,9 @@ func TestProcessPost(t *testing.T) {
 		Open for inspections this Saturday (8th July)☺️
 		If you feel like this could be your new home, please message me with a little bit about yourself!
 		P.S: The property was offered unfurnished. We have some furniture, including a sofa, kitchen appliances, and a TV. You are welcome to bring your own furniture or contribute towards getting any additional items needed.`
+	url := "https://www.facebook.com/groups/2280085492006745/permalink/7148701135145132/"
 
-		rental, err := utils.ProcessPost(ctx, llm, post)
-		if err != nil {
-			t.Error(err)
-		}
-
+	t.Run("Save to database", func(t *testing.T) {
 		price := 270
 		bond := 1080
 		location := "Drummoyne"
@@ -72,9 +69,9 @@ func TestProcessPost(t *testing.T) {
 		var age utils.AgeSchema = "Young"
 		var duration utils.DurationSchema = "Long Term"
 		var tenant utils.TenantSchema = "Singles"
-		features := []utils.FeatureSchema{}
+		features := []utils.FeatureSchema{"WiFi"}
 
-		correctRental := &utils.RentalSchema{
+		rental := &utils.RentalSchema{
 			Price:      &price,
 			Bond:       &bond,
 			Location:   &location,
@@ -86,32 +83,14 @@ func TestProcessPost(t *testing.T) {
 			Features:   features,
 		}
 
-		if !reflect.DeepEqual(rental, correctRental) {
-			t.Log(rental)
-			t.Log(correctRental)
-
-			t.Error("Structs are not equal")
-		}
-	})
-
-	t.Run("Standard invalid post", func(t *testing.T) {
-		post := `Hi! I'm looking for a 2 bedroom furnished apartment or a bedroom for 2 people in a shared house/flat. Ideally in the city, or suburbs near the city (Potts Point, Surry hills…), bondi, Randwick or coogee.
-		We have a good realtor as a reference. We are tidy, clean and not party people.
-		Please DM me if you have one for long term rent.`
-
-		if _, err := utils.ProcessPost(ctx, llm, post); err == nil {
+		if err := utils.SaveRental(ctx, db, rental, url, env.AWSLocationPlaceIndex); err != nil {
 			t.Error(err)
 		}
 	})
 
-	t.Run("Address To Coords", func(t *testing.T) {
-		address := "Sydney Olympic Park"
-
-		latitude, longitude, err := utils.CoordsFromAddress(ctx, address, env.AWSLocationPlaceIndex)
-		if err != nil {
+	t.Run("Create post", func(t *testing.T) {
+		if _, err := main.HandleRequest(ctx, main.Event{Post: post, URL: url}); err != nil {
 			t.Error(err)
 		}
-
-		t.Log(latitude, longitude)
 	})
 }
