@@ -26,7 +26,7 @@ func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 		return nil, err
 	}
 
-	db, err := gorm.Open(mysql.Open(env.DSN), &gorm.Config{DisableForeignKeyConstraintWhenMigrating: true})
+	db, err := gorm.Open(mysql.Open(env.DSN))
 	if err != nil {
 		return nil, err
 	}
