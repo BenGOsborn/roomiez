@@ -7,6 +7,14 @@ import (
 
 	"github.com/tmc/langchaingo/chains"
 	"github.com/tmc/langchaingo/llms/openai"
+
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/location"
+)
+
+const (
+	CentreLongitude = 151.2093
+	CentreLatitude  = 33.8688
 )
 
 type RentalTypeSchema string
@@ -97,4 +105,34 @@ func ProcessPost(ctx context.Context, llm *openai.Chat, post string) (*RentalSch
 	}
 
 	return rental, nil
+}
+
+// Get coords from an address
+func CoordsFromAddress(ctx context.Context, address string, placeIndexName string) (float64, float64, error) {
+	cfg, err := config.LoadDefaultConfig(ctx)
+	if err != nil {
+		return -1, -1, err
+	}
+
+	svc := location.NewFromConfig(cfg)
+
+	response, err := svc.SearchPlaceIndexForText(ctx, &location.SearchPlaceIndexForTextInput{
+		IndexName:    &placeIndexName,
+		Text:         &address,
+		BiasPosition: []float64{CentreLongitude, CentreLatitude},
+		MaxResults:   1,
+	})
+	if err != nil {
+		return -1, -1, err
+	}
+
+	if len(response.Results) == 0 {
+		return -1, -1, errors.New("invalid address")
+	}
+
+	place := response.Results[0].Place
+	latitude := place.Geometry.Point[1]
+	longitude := place.Geometry.Point[0]
+
+	return latitude, longitude, nil
 }

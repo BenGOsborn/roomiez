@@ -106,4 +106,15 @@ func TestProcessPost(t *testing.T) {
 			t.Error(err)
 		}
 	})
+
+	t.Run("Address To Coords", func(t *testing.T) {
+		address := "Sydney Olympic Park"
+
+		latitude, longitude, err := utils.CoordsFromAddress(ctx, address, os.Getenv("AWS_LOCATION_PLACE_INDEX"))
+		if err != nil {
+			t.Error(err)
+		}
+
+		t.Log(latitude, longitude)
+	})
 }
