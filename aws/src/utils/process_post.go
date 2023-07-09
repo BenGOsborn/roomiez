@@ -2,8 +2,6 @@ package utils
 
 import (
 	"context"
-	"crypto/md5"
-	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -141,13 +139,77 @@ func CoordsFromAddress(ctx context.Context, address string, placeIndexName strin
 	return latitude, longitude, nil
 }
 
-// Save rental to database
-func CreateRental(db *gorm.DB, post string) error {
-	hash := md5.New()
-	hash.Write([]byte(post))
-	hashString := hex.EncodeToString(hash.Sum(nil))
+// Save a rental to database
+func SaveRental(ctx context.Context, db *gorm.DB, rental *RentalSchema, hash string, placeIndexName string) error {
+	newRental := &Rental{}
 
-	fmt.Printf("hashString: %v\n", hashString)
+	newRental.PostHash = hash
+	newRental.Price = rental.Price
+	newRental.Bond = rental.Bond
 
-	return nil
+	if rental.Location != nil {
+		latitude, longitude, err := CoordsFromAddress(ctx, *rental.Location, placeIndexName)
+		if err != nil {
+			return err
+		}
+
+		coordinates := fmt.Sprintf("POINT(%f %f)", longitude, latitude)
+		newRental.Coordinates = &coordinates
+	}
+
+	if rental.RentalType != nil {
+		rentalType := &RentalType{}
+		if err := db.First(rentalType, "type = ?", *rental.RentalType).Error; err != nil {
+			return err
+		}
+
+		newRental.RentalTypeID = &rentalType.ID
+	}
+
+	if rental.Gender != nil {
+		gender := &Gender{}
+		if err := db.First(gender, "preference = ?", *rental.Gender).Error; err != nil {
+			return err
+		}
+
+		newRental.GenderID = &gender.ID
+	}
+
+	if rental.Age != nil {
+		age := &Age{}
+		if err := db.First(age, "preference = ?", *rental.Age).Error; err != nil {
+			return err
+		}
+
+		newRental.AgeID = &age.ID
+	}
+
+	if rental.Duration != nil {
+		duration := &Duration{}
+		if err := db.First(duration, "preference = ?", *rental.Duration).Error; err != nil {
+			return err
+		}
+
+		newRental.DurationID = &duration.ID
+	}
+
+	if rental.Tenant != nil {
+		tenant := &Tenant{}
+		if err := db.First(tenant, "preference = ?", *rental.Tenant).Error; err != nil {
+			return err
+		}
+
+		newRental.TenantID = &tenant.ID
+	}
+
+	if len(rental.Features) > 0 {
+		existingFeatures := []Feature{}
+		if err := db.Find(&existingFeatures, "name IN ?", rental.Features).Error; err != nil {
+			return err
+		}
+
+		newRental.Features = append(newRental.Features, existingFeatures...)
+	}
+
+	return db.Create(newRental).Error
 }
