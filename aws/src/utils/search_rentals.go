@@ -16,27 +16,35 @@ type SearchParams struct {
 	Age        *string
 	Duration   *string
 	Tenant     *string
-	Features   []string
+	Features   *[]string
+}
+
+type RentalResult struct {
+	ID                 uint    `json:"id"`
+	URL                string  `json:"url"`
+	Coordinates        *string `json:"coordinates"`
+	Price              *int    `json:"price"`
+	Bond               *int    `json:"bond"`
+	RentalType         *string `json:"rentalType"`
+	GenderPreference   *string `json:"gender"`
+	AgePreference      *string `json:"age"`
+	DurationPreference *string `json:"duration"`
+	TenantPreference   *string `json:"tenant"`
+}
+
+type FeatureResult struct {
+	RentalID    uint
+	FeatureName string
 }
 
 type SearchResult struct {
-	ID                 uint
-	URL                string
-	Coordinates        *string
-	Price              *int
-	Bond               *int
-	RentalType         *string
-	GenderPreference   *string
-	AgePreference      *string
-	DurationPreference *string
-	TenantPreference   *string
-	// Features           []string
+	RentalResult
+	Features *[]string `json:"features"`
 }
-
-// **** I need 3 structs - the final combines the two for the array and the searchresult here - we need to fetch and group by separately for our records then assign the correct features from the rental ids (group by rental id)
 
 // Find a list of rentals that match the search params
 func SearchRentals(db *gorm.DB, searchParams *SearchParams, perPage uint) (*[]SearchResult, error) {
+	// Retrieve all matching rentals
 	query := db.Table("rentals")
 
 	query = query.Select("rentals.id", "rentals.url", "rentals.coordinates", "rentals.price", "rentals.bond",
@@ -82,8 +90,8 @@ func SearchRentals(db *gorm.DB, searchParams *SearchParams, perPage uint) (*[]Se
 	}
 
 	if searchParams.Features != nil {
-		for _, feature := range searchParams.Features {
-			query = query.Where("EXISTS (SELECT 1 FROM user_languages JOIN features ON features.id = user_languages.feature_id WHERE user_languages.rental_id = rentals.id AND features.name = ?)", feature)
+		for _, feature := range *searchParams.Features {
+			query = query.Where("EXISTS (SELECT 1 FROM rental_features JOIN features ON features.id = rental_features.feature_id WHERE rental_features.rental_id = rentals.id AND features.name = ?)", feature)
 		}
 	}
 
@@ -93,10 +101,49 @@ func SearchRentals(db *gorm.DB, searchParams *SearchParams, perPage uint) (*[]Se
 
 	query = query.Offset((int(searchParams.Page) - 1) * int(perPage)).Limit(int(perPage))
 
-	results := &[]SearchResult{}
-	if err := query.Find(results).Error; err != nil {
+	rentalResults := &[]RentalResult{}
+	if err := query.Find(rentalResults).Error; err != nil {
 		return nil, err
 	}
 
-	return results, nil
+	// Retrieve associated features
+	query = db.Table("rental_features")
+
+	query = query.Select(
+		"rental_features.rental_id AS rental_id",
+		"features.name AS feature_name",
+	)
+
+	query = query.Joins("JOIN features ON rental_features.feature_id = features.id")
+
+	rentalIds := &[]uint{}
+	for _, result := range *rentalResults {
+		*rentalIds = append(*rentalIds, result.ID)
+	}
+	query = query.Where("rental_features.rental_id IN ?", *rentalIds)
+
+	featureResults := &[]FeatureResult{}
+	if err := query.Find(featureResults).Error; err != nil {
+		return nil, err
+	}
+
+	// Join rentals and features
+	features := make(map[uint][]string)
+
+	for _, result := range *featureResults {
+		features[result.RentalID] = append(features[result.RentalID], result.FeatureName)
+	}
+
+	searchResults := &[]SearchResult{}
+	for _, result := range *rentalResults {
+		temp, ok := features[result.ID]
+		if ok {
+			*searchResults = append(*searchResults, SearchResult{RentalResult: result, Features: &temp})
+		} else {
+			*searchResults = append(*searchResults, SearchResult{RentalResult: result})
+		}
+
+	}
+
+	return searchResults, nil
 }

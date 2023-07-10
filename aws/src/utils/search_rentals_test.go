@@ -2,7 +2,6 @@ package utils_test
 
 import (
 	"context"
-	"fmt"
 	"testing"
 
 	"github.com/bengosborn/roomiez/aws/utils"
@@ -61,15 +60,11 @@ func TestSearchRentals(t *testing.T) {
 			t.Error("out of bounds records included")
 		}
 
-		rentals, err = utils.SearchRentals(db, &utils.SearchParams{Page: 1, Features: []string{"Mattress", "WiFi"}}, perPage)
+		rentals, err = utils.SearchRentals(db, &utils.SearchParams{Page: 1, Features: &[]string{"Mattress", "WiFi"}}, perPage)
 		if err != nil {
 			t.Error(err)
 		} else if len(*rentals) == 0 {
 			t.Error("no records found")
 		}
-
-		fmt.Println(rentals)
-
-		t.Error("haha")
 	})
 }

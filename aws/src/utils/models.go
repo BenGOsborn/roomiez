@@ -15,7 +15,7 @@ type Rental struct {
 	AgeID        *uint
 	DurationID   *uint
 	TenantID     *uint
-	Features     []Feature `gorm:"many2many:user_languages;"`
+	Features     []Feature `gorm:"many2many:rental_features;"`
 }
 
 // Apartment, house, granny flat
