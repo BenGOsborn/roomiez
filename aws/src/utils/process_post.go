@@ -109,7 +109,9 @@ func SaveRental(ctx context.Context, db *gorm.DB, rental *RentalSchema, url stri
 		}
 
 		coordinates := fmt.Sprintf("POINT(%f %f)", longitude, latitude)
+
 		newRental.Coordinates = &coordinates
+		newRental.Location = rental.Location
 	}
 
 	if rental.RentalType != nil {

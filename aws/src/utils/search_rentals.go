@@ -22,7 +22,7 @@ type SearchParams struct {
 type RentalResult struct {
 	ID                 uint    `json:"id"`
 	URL                string  `json:"url"`
-	Coordinates        *string `json:"coordinates"`
+	Location           *string `json:"location"`
 	Price              *int    `json:"price"`
 	Bond               *int    `json:"bond"`
 	RentalType         *string `json:"rentalType"`
@@ -47,7 +47,7 @@ func SearchRentals(db *gorm.DB, searchParams *SearchParams, perPage uint) (*[]Se
 	// Retrieve all matching rentals
 	query := db.Table("rentals")
 
-	query = query.Select("rentals.id", "rentals.url", "rentals.coordinates", "rentals.price", "rentals.bond",
+	query = query.Select("rentals.id", "rentals.url", "rentals.location", "rentals.coordinates", "rentals.price", "rentals.bond",
 		"rental_types.type AS rental_type",
 		"genders.preference AS gender_preference",
 		"ages.preference AS age_preference",

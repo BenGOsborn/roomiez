@@ -7,6 +7,7 @@ import (
 type Rental struct {
 	gorm.Model
 	URL          string `gorm:"unique"`
+	Location     *string
 	Coordinates  *string
 	Price        *int
 	Bond         *int
