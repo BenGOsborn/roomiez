@@ -36,6 +36,26 @@ resource "aws_api_gateway_deployment" "deployment" {
   stage_description = "Deployed at ${timestamp()}"
 }
 
+resource "aws_api_gateway_api_key" "api_key" {
+  name    = "api-key"
+  enabled = true
+}
+
+resource "aws_api_gateway_usage_plan" "usage_plan" {
+  name = "usage-plan"
+
+  api_stages {
+    api_id = aws_api_gateway_rest_api.rest_api.id
+    stage  = aws_api_gateway_deployment.deployment.stage_name
+  }
+}
+
+resource "aws_api_gateway_usage_plan_key" "usage_plan_key" {
+  key_id        = aws_api_gateway_api_key.api_key.id
+  key_type      = "API_KEY"
+  usage_plan_id = aws_api_gateway_usage_plan.usage_plan.id
+}
+
 # Roles
 
 resource "aws_iam_role" "lambda_role" {
