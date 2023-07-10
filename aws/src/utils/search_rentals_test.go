@@ -2,6 +2,7 @@ package utils_test
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/bengosborn/roomiez/aws/utils"
@@ -39,7 +40,7 @@ func TestSearchRentals(t *testing.T) {
 			t.Error(err)
 		} else if len(*rentalsSecond) > int(perPage) {
 			t.Error("page size exceeded")
-		} else if (*rentalsFirst)[0].ID == (*rentalsSecond)[0].ID {
+		} else if (*rentalsFirst)[0].URL == (*rentalsSecond)[0].URL {
 			t.Error("pages contain overlap")
 		}
 	})
@@ -47,7 +48,7 @@ func TestSearchRentals(t *testing.T) {
 	t.Run("Geo search", func(t *testing.T) {
 		t.Helper()
 
-		var perPage uint = 1
+		var perPage uint = 10
 
 		latitude := 0.0
 		longitude := 0.0
@@ -60,15 +61,15 @@ func TestSearchRentals(t *testing.T) {
 			t.Error("out of bounds records included")
 		}
 
-		longitude = -40.0
-		latitude = 160.0
-		radius = 100
-
-		rentals, err = utils.SearchRentals(db, &utils.SearchParams{Page: 1, Latitude: &latitude, Longitude: &longitude, Radius: &radius}, perPage)
+		rentals, err = utils.SearchRentals(db, &utils.SearchParams{Page: 1, Features: []string{"Mattress", "WiFi"}}, perPage)
 		if err != nil {
 			t.Error(err)
 		} else if len(*rentals) == 0 {
 			t.Error("no records found")
 		}
+
+		fmt.Println(rentals)
+
+		t.Error("haha")
 	})
 }
