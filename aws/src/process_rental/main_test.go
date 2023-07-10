@@ -66,12 +66,12 @@ func TestHandleRequest(t *testing.T) {
 		price := 270
 		bond := 1080
 		location := "Drummoyne"
-		var rentalType utils.RentalTypeSchema = "Apartment"
-		var gender utils.GenderSchema = "Female"
-		var age utils.AgeSchema = "Young"
-		var duration utils.DurationSchema = "Long Term"
-		var tenant utils.TenantSchema = "Singles"
-		features := []utils.FeatureSchema{"WiFi"}
+		rentalType := "Apartment"
+		gender := "Female"
+		age := "Young"
+		duration := "Long Term"
+		tenant := "Singles"
+		features := []string{"WiFi"}
 
 		rental := &utils.RentalSchema{
 			Price:      &price,

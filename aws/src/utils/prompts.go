@@ -51,6 +51,7 @@ func NewPostValidation(llm *openai.Chat) *chains.LLMChain {
 func NewPostExtraction(llm *openai.Chat) *chains.LLMChain {
 	prompt := prompts.NewPromptTemplate(`Given the following post, please extract the information and format it as a JSON object that strictly follows the schema described below. Ensure that each extracted field corresponds to its respective field in the schema.
 	For example, if the post contains information about the price, assign the extracted price to the "price" field in the JSON object.
+	It is very important that the JSON generated matches the schema exactly.
 	Please note that 'Young' is classified as anyone between 18 and 35 years old, 'Middle Aged' is anyone between 36 and 55 years old, and 'Old' is anyone older than 56.
 	Your response should be a JSON string on a new line after "Output:".
 
@@ -64,7 +65,7 @@ func NewPostExtraction(llm *openai.Chat) *chains.LLMChain {
 		age?: "Young" | "Middle Aged" | "Old" | null;
 		duration?: "Short Term" | "Long Term" | null;
 		tenant?: "Singles" | "Couples" | null;
-		features?: ("Garage" | "WiFi" | "Bills Included" | "Furnished")[];
+		features?: ("Garage" | "WiFi" | "Bills Included" | "Furnished" | "Pets Allowed" | "Garage" | "Mattress" | "Pool" | "Gym")[];
 	}
 
 	Some examples have been provided below to give you context.
@@ -140,7 +141,8 @@ func NewPostExtraction(llm *openai.Chat) *chains.LLMChain {
 		"tenant": "Singles",
 		"features": [
 			"Bills Included",
-			"WiFi"
+			"WiFi",
+			"Mattress"
 		]
 	}	
 

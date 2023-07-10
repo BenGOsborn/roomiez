@@ -99,5 +99,20 @@ func TestModels(t *testing.T) {
 		if res := db.Create(&utils.Feature{Name: "Furnished"}); res.Error != nil {
 			t.Log(res.Error)
 		}
+		if res := db.Create(&utils.Feature{Name: "Pets Allowed"}); res.Error != nil {
+			t.Log(res.Error)
+		}
+		if res := db.Create(&utils.Feature{Name: "Garage"}); res.Error != nil {
+			t.Log(res.Error)
+		}
+		if res := db.Create(&utils.Feature{Name: "Mattress"}); res.Error != nil {
+			t.Log(res.Error)
+		}
+		if res := db.Create(&utils.Feature{Name: "Pool"}); res.Error != nil {
+			t.Log(res.Error)
+		}
+		if res := db.Create(&utils.Feature{Name: "Gym"}); res.Error != nil {
+			t.Log(res.Error)
+		}
 	})
 }

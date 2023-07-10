@@ -19,61 +19,16 @@ const (
 	CentreLatitude  = 33.8688
 )
 
-type RentalTypeSchema string
-
-const (
-	RentalTypeApartment RentalTypeSchema = "Apartment"
-	RentalTypeHouse     RentalTypeSchema = "House"
-)
-
-type GenderSchema string
-
-const (
-	GenderMale   GenderSchema = "Male"
-	GenderFemale GenderSchema = "Female"
-)
-
-type AgeSchema string
-
-const (
-	AgeYoung      AgeSchema = "Young"
-	AgeMiddleAged AgeSchema = "Middle Aged"
-	AgeOld        AgeSchema = "Old"
-)
-
-type DurationSchema string
-
-const (
-	DurationShortTerm DurationSchema = "Short Term"
-	DurationLongTerm  DurationSchema = "Long Term"
-)
-
-type TenantSchema string
-
-const (
-	TenantSingles TenantSchema = "Singles"
-	TenantCouples TenantSchema = "Couples"
-)
-
-type FeatureSchema string
-
-const (
-	FeatureGarage        FeatureSchema = "Garage"
-	FeatureWiFi          FeatureSchema = "WiFi"
-	FeatureBillsIncluded FeatureSchema = "Bills Included"
-	FeatureFurnished     FeatureSchema = "Furnished"
-)
-
 type RentalSchema struct {
-	Price      *int              `json:"price"`
-	Bond       *int              `json:"bond"`
-	Location   *string           `json:"location"`
-	RentalType *RentalTypeSchema `json:"rentalType"`
-	Gender     *GenderSchema     `json:"gender"`
-	Age        *AgeSchema        `json:"age"`
-	Duration   *DurationSchema   `json:"duration"`
-	Tenant     *TenantSchema     `json:"tenant"`
-	Features   []FeatureSchema   `json:"features"`
+	Price      *int     `json:"price"`
+	Bond       *int     `json:"bond"`
+	Location   *string  `json:"location"`
+	RentalType *string  `json:"rentalType"`
+	Gender     *string  `json:"gender"`
+	Age        *string  `json:"age"`
+	Duration   *string  `json:"duration"`
+	Tenant     *string  `json:"tenant"`
+	Features   []string `json:"features"`
 }
 
 func (r *RentalSchema) String() string {
