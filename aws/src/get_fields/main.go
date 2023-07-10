@@ -3,7 +3,9 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"log"
 	"net/http"
+	"os"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -14,26 +16,38 @@ import (
 
 func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
 	// Load requirements
+	logger := log.New(os.Stdout, "[GetFields] ", log.Ldate|log.Ltime)
+
 	env, err := utils.LoadEnv(ctx)
 	if err != nil {
+		logger.Println(err)
+
 		return nil, err
 	}
 
 	db, err := gorm.Open(mysql.Open(env.DSN))
 	if err != nil {
+		logger.Println(err)
+
 		return nil, err
 	}
 
 	// Return all fields
 	fields, err := utils.GetFields(db)
 	if err != nil {
+		logger.Println(err)
+
 		return nil, err
 	}
 
 	body, err := json.Marshal(fields)
 	if err != nil {
+		logger.Println(err)
+
 		return nil, err
 	}
+
+	logger.Println(body)
 
 	return &events.APIGatewayProxyResponse{
 		StatusCode: http.StatusOK,

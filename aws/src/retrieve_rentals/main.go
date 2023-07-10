@@ -3,7 +3,9 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"log"
 	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -19,24 +21,36 @@ const (
 
 func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
 	// Load requirements
+	logger := log.New(os.Stdout, "[RetrieveRentals] ", log.Ldate|log.Ltime)
+
 	env, err := utils.LoadEnv(ctx)
 	if err != nil {
+		logger.Println(err)
+
 		return nil, err
 	}
 
 	db, err := gorm.Open(mysql.Open(env.DSN))
 	if err != nil {
+		logger.Println(err)
+
 		return nil, err
 	}
 
 	// Seach for rentals
 	searchParams, err := ParseQueryString(&request.MultiValueQueryStringParameters)
 	if err != nil {
+		logger.Println(err)
+
 		return nil, err
 	}
 
+	logger.Println(searchParams)
+
 	rentals, err := utils.SearchRentals(db, searchParams, PageSize)
 	if err != nil {
+		logger.Println(err)
+
 		return nil, err
 	}
 
@@ -44,6 +58,8 @@ func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 	if err != nil {
 		return nil, err
 	}
+
+	logger.Println(body)
 
 	return &events.APIGatewayProxyResponse{
 		StatusCode: http.StatusOK,
