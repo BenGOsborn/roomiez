@@ -23,6 +23,8 @@ func TestModels(t *testing.T) {
 	}
 
 	t.Run("Seed data", func(t *testing.T) {
+		t.Helper()
+
 		// Initialize tables
 		if err := db.AutoMigrate(&utils.Rental{}); err != nil {
 			t.Error(err)

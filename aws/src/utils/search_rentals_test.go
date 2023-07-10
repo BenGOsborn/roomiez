@@ -23,6 +23,8 @@ func TestSearchRentals(t *testing.T) {
 	}
 
 	t.Run("Pagination search", func(t *testing.T) {
+		t.Helper()
+
 		var perPage uint = 1
 
 		rentalsFirst, err := utils.SearchRentals(db, &utils.SearchParams{Page: 1}, perPage)
@@ -43,6 +45,8 @@ func TestSearchRentals(t *testing.T) {
 	})
 
 	t.Run("Geo search", func(t *testing.T) {
+		t.Helper()
+
 		var perPage uint = 1
 
 		latitude := 0.0

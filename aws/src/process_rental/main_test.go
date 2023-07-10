@@ -63,6 +63,8 @@ func TestHandleRequest(t *testing.T) {
 	url := "https://www.facebook.com/groups/2280085492006745/permalink/7148701135145132/"
 
 	t.Run("Save to database", func(t *testing.T) {
+		t.Helper()
+
 		price := 270
 		bond := 1080
 		location := "Drummoyne"
@@ -91,6 +93,8 @@ func TestHandleRequest(t *testing.T) {
 	})
 
 	t.Run("Create post", func(t *testing.T) {
+		t.Helper()
+
 		body, err := json.Marshal(&main.Body{Post: post, URL: url})
 		if err != nil {
 			t.Error(err)
