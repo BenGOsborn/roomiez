@@ -88,6 +88,8 @@ resource "aws_api_gateway_method" "rentals_fields_get_method" {
   authorization = "NONE"
 }
 
+# **** API DOES NOT AUTO DEPLOY ???
+
 resource "aws_api_gateway_integration" "rentals_fields_get_lambda_integration" {
   rest_api_id             = aws_api_gateway_rest_api.rest_api.id
   resource_id             = aws_api_gateway_resource.rentals_fields_resource.id
