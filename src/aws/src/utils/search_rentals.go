@@ -62,11 +62,11 @@ func SearchRentals(db *gorm.DB, searchParams *SearchParams, perPage uint) (*[]Se
 		Joins("LEFT JOIN tenants ON rentals.tenant_id = tenants.id")
 
 	if searchParams.Price != nil {
-		query = query.Where("price = ?", searchParams.Price)
+		query = query.Where("price < ?", searchParams.Price)
 	}
 
 	if searchParams.Bond != nil {
-		query = query.Where("bond = ?", searchParams.Bond)
+		query = query.Where("bond < ?", searchParams.Bond)
 	}
 
 	if searchParams.RentalType != nil {
@@ -122,28 +122,33 @@ func SearchRentals(db *gorm.DB, searchParams *SearchParams, perPage uint) (*[]Se
 	}
 	query = query.Where("rental_features.rental_id IN ?", *rentalIds)
 
-	featureResults := &[]FeatureResult{}
-	if err := query.Find(featureResults).Error; err != nil {
+	featureResults := []FeatureResult{}
+	if err := query.Find(&featureResults).Error; err != nil {
 		return nil, err
 	}
 
 	// Join rentals and features
-	features := make(map[uint][]string)
+	features := make(map[uint]*[]string)
 
-	for _, result := range *featureResults {
-		features[result.RentalID] = append(features[result.RentalID], result.FeatureName)
+	for _, result := range featureResults {
+		arr, ok := features[result.RentalID]
+		if ok {
+			*arr = append(*arr, result.FeatureName)
+		} else {
+			features[result.RentalID] = &[]string{result.FeatureName}
+		}
 	}
 
-	searchResults := &[]SearchResult{}
+	searchResults := []SearchResult{}
 	for _, result := range *rentalResults {
 		temp, ok := features[result.ID]
 		if ok {
-			*searchResults = append(*searchResults, SearchResult{RentalResult: result, Features: &temp})
+			searchResults = append(searchResults, SearchResult{RentalResult: result, Features: temp})
 		} else {
-			*searchResults = append(*searchResults, SearchResult{RentalResult: result})
+			searchResults = append(searchResults, SearchResult{RentalResult: result})
 		}
 
 	}
 
-	return searchResults, nil
+	return &searchResults, nil
 }
