@@ -15,11 +15,10 @@
 		<div class="bg-white p-4 rounded-md flex flex-col space-y-4 drop-shadow">
 			<p class="text-gray-800 font-bold">Filters</p>
 			<div class="grid grid-cols-2 gap-4">
-				<!-- **** HOW DO I ADD AN ANY OPTION TO THIS -->
-
 				<div class="space-y-2">
 					<p class="text-gray-800 font-medium text-sm">Age</p>
 					<select>
+						<option>Any</option>
 						{#each fields.age as age}
 							<option value={age}>{age}</option>
 						{/each}
@@ -28,6 +27,7 @@
 				<div class="space-y-2">
 					<p class="text-gray-800 font-medium text-sm">Duration</p>
 					<select>
+						<option>Any</option>
 						{#each fields.duration as duration}
 							<option value={duration}>{duration}</option>
 						{/each}
@@ -36,6 +36,7 @@
 				<div class="space-y-2">
 					<p class="text-gray-800 font-medium text-sm">Gender</p>
 					<select>
+						<option>Any</option>
 						{#each fields.gender as gender}
 							<option value={gender}>{gender}</option>
 						{/each}
@@ -44,6 +45,7 @@
 				<div class="space-y-2">
 					<p class="text-gray-800 font-medium text-sm">Rental Type</p>
 					<select>
+						<option>Any</option>
 						{#each fields.rentalType as rentalType}
 							<option value={rentalType}>{rentalType}</option>
 						{/each}
@@ -52,6 +54,7 @@
 				<div class="space-y-2">
 					<p class="text-gray-800 font-medium text-sm">Tenant</p>
 					<select>
+						<option>Any</option>
 						{#each fields.tenant as tenant}
 							<option value={tenant}>{tenant}</option>
 						{/each}
