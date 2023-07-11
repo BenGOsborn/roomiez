@@ -1,30 +1,19 @@
-<script lang="ts" async="true">
+<script lang="ts">
 	import { PUBLIC_API_ENDPOINT } from "$env/static/public";
 	import { getFields, getRentals } from "$lib/api";
-	import Nav from "../components/nav.svelte";
-
-	let x = 0;
-
-    const fieldsPromise = getFields(PUBLIC_API_ENDPOINT)
-    const rentalsPromise = getRentals(PUBLIC_API_ENDPOINT, {page: 1})
+	import Rental from "../components/rental.svelte";
 </script>
 
-<Nav />
-
-<h1>Welcome to SvelteKit</h1>
-<p>{x}</p>
-<p>{PUBLIC_API_ENDPOINT}</p>
-
-{#await fieldsPromise}
-    <p>Loading fields...</p>
-{:then data} 
-    <p>{JSON.stringify(data)}</p> 
+{#await getFields(PUBLIC_API_ENDPOINT)}
+	<p>Loading fields...</p>
+{:then data}
+	<p>{JSON.stringify(data)}</p>
 {/await}
 
-{#await rentalsPromise}
-    <p>Loading rentals...</p> 
-{:then data} 
-    <p>{JSON.stringify(data)}</p> 
+{#await getRentals(PUBLIC_API_ENDPOINT, { page: 1 })}
+	<p>Loading rentals...</p>
+{:then rentals}
+	{#each rentals as rental (rental.id)}
+		<Rental {rental} />
+	{/each}
 {/await}
-
-<button on:click={() => (x = x + 1)}>Increment</button>

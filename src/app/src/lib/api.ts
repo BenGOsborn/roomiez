@@ -50,7 +50,7 @@ const searchResultSchema = z.object({
 	features: z.array(z.string()).nullable()
 });
 
-type SearchResult = z.infer<typeof searchResultSchema>;
+export type SearchResult = z.infer<typeof searchResultSchema>;
 
 // Get rentals matching the search criteria
 export async function getRentals(apiBase: string, searchFields: SearchFields): Promise<SearchResult[]> {

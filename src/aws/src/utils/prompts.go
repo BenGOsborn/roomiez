@@ -52,7 +52,9 @@ func NewPostExtraction(llm *openai.Chat) *chains.LLMChain {
 	prompt := prompts.NewPromptTemplate(`Given the following post, please extract the information and format it as a JSON object that strictly follows the schema described below. Ensure that each extracted field corresponds to its respective field in the schema.
 	For example, if the post contains information about the price, assign the extracted price to the "price" field in the JSON object.
 	It is very important that the JSON generated matches the schema exactly.
-	Please note that 'Young' is classified as anyone between 18 and 35 years old, 'Middle Aged' is anyone between 36 and 55 years old, and 'Old' is anyone older than 56.
+	Note that 'Young' is classified as anyone between 18 and 35 years old, 'Middle Aged' is anyone between 36 and 55 years old, and 'Old' is anyone older than 56.
+	In addition, the price should ALWAYS be the weekly price.
+	If there is any ambiguity and the field supports null, it is best to put null.
 	Your response should be a JSON string on a new line after "Output:".
 
 	JSON Schema:
