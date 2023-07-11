@@ -1,19 +1,22 @@
 import axios from "axios";
+import { z } from "zod";
 
-interface Fields {
-	rentalType: string[];
-	gender: string[];
-	age: string[];
-	duration: string[];
-	tenant: string[];
-	feature: string[];
-}
+const fieldsSchema = z.object({
+	rentalType: z.array(z.string()),
+	gender: z.array(z.string()),
+	age: z.array(z.string()),
+	duration: z.array(z.string()),
+	tenant: z.array(z.string()),
+	feature: z.array(z.string())
+});
+
+type Fields = z.infer<typeof fieldsSchema>;
 
 // Get the search fields
 export async function getFields(apiBase: string): Promise<Fields> {
 	const { data } = await axios.get<Fields>(`${apiBase}/rentals/fields`);
 
-	return data;
+	return fieldsSchema.parse(data);
 }
 
 interface SearchFields {
@@ -33,19 +36,21 @@ interface SearchFields {
 	features?: string[];
 }
 
-interface SearchResult {
-	id: number;
-	url: string;
-	location?: string;
-	price?: number;
-	bond?: number;
-	rentalType?: string;
-	gender?: string;
-	age?: string;
-	duration?: string;
-	tenant?: string;
-	features?: string[];
-}
+const searchResultSchema = z.object({
+	id: z.number(),
+	url: z.string(),
+	location: z.string().nullable(),
+	price: z.number().nullable(),
+	bond: z.number().nullable(),
+	rentalType: z.string().nullable(),
+	gender: z.string().nullable(),
+	age: z.string().nullable(),
+	duration: z.string().nullable(),
+	tenant: z.string().nullable(),
+	features: z.array(z.string()).nullable()
+});
+
+type SearchResult = z.infer<typeof searchResultSchema>;
 
 // Get rentals matching the search criteria
 export async function getRentals(apiBase: string, searchFields: SearchFields): Promise<SearchResult[]> {
@@ -66,5 +71,5 @@ export async function getRentals(apiBase: string, searchFields: SearchFields): P
 	// Make request
 	const { data } = await axios.get<SearchResult[]>(`${apiBase}/rentals${queryParams}`);
 
-	return data;
+	return z.array(searchResultSchema).parse(data);
 }
