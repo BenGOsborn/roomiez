@@ -1,19 +1,25 @@
 <script lang="ts">
 	import { PUBLIC_API_ENDPOINT } from "$env/static/public";
-	import { getFields, getRentals } from "$lib/api";
-	import Rental from "../components/rental.svelte";
+	import { getRentals } from "$lib/api";
+	import Query from "../components/Query.svelte";
+	import Rental from "../components/Rental.svelte";
 </script>
 
-{#await getFields(PUBLIC_API_ENDPOINT)}
-	<p>Loading fields...</p>
-{:then data}
-	<p>{JSON.stringify(data)}</p>
-{/await}
-
-{#await getRentals(PUBLIC_API_ENDPOINT, { page: 1 })}
-	<p>Loading rentals...</p>
-{:then rentals}
-	{#each rentals as rental (rental.id)}
-		<Rental {rental} />
-	{/each}
-{/await}
+<div class="mx-auto w-4/5 mt-8">
+	<div class="flex justify-between space-x-8">
+		<div class="w-1/4">
+			<Query />
+		</div>
+		<div class="w-3/4">
+			{#await getRentals(PUBLIC_API_ENDPOINT, { page: 1 })}
+				<p class="text-center font-medium text-gray-800">Loading rentals...</p>
+			{:then rentals}
+				<div class="grid grid-cols-2 gap-8">
+					{#each rentals as rental (rental.id)}
+						<Rental {rental} />
+					{/each}
+				</div>
+			{/await}
+		</div>
+	</div>
+</div>

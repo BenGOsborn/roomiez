@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { SearchResult } from "$lib/api";
-	import Tag from "./tag.svelte";
+	import Tag from "./Tag.svelte";
 
 	export let rental: SearchResult;
 </script>
@@ -14,10 +14,10 @@
 				<p class="text-gray-500"><span class="text-gray-700 font-medium">Location:</span> {rental.location}</p>
 			{/if}
 			{#if rental.price}
-				<p class="text-gray-500"><span class="text-gray-700 font-medium">Price:</span> ${rental.price} AUD / week</p>
+				<p class="text-gray-500"><span class="text-gray-700 font-medium">Price:</span> ${rental.price.toLocaleString()} AUD / week</p>
 			{/if}
 			{#if rental.bond}
-				<p class="text-gray-500"><span class="text-gray-700 font-medium">Bond:</span> ${rental.bond} AUD</p>
+				<p class="text-gray-500"><span class="text-gray-700 font-medium">Bond:</span> ${rental.bond.toLocaleString()} AUD</p>
 			{/if}
 			{#if rental.rentalType}
 				<p class="text-gray-500"><span class="text-gray-700 font-medium">Rental type:</span> {rental.rentalType}</p>
