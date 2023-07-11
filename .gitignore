@@ -7,8 +7,8 @@ terraform.tfstate*
 # Svelte
 .DS_Store
 node_modules
-/build
-/.svelte-kit
+# build/
+# .svelte-kit/
 /package
 !.env.example
 vite.config.js.timestamp-*
