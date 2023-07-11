@@ -33,29 +33,6 @@ interface SearchFields {
 	features?: string[];
 }
 
-// type RentalResult struct {
-// 	ID                 uint    `json:"id"`
-// 	URL                string  `json:"url"`
-// 	Location           *string `json:"location"`
-// 	Price              *int    `json:"price"`
-// 	Bond               *int    `json:"bond"`
-// 	RentalType         *string `json:"rentalType"`
-// 	GenderPreference   *string `json:"gender"`
-// 	AgePreference      *string `json:"age"`
-// 	DurationPreference *string `json:"duration"`
-// 	TenantPreference   *string `json:"tenant"`
-// }
-
-// type FeatureResult struct {
-// 	RentalID    uint
-// 	FeatureName string
-// }
-
-// type SearchResult struct {
-// 	RentalResult
-// 	Features *[]string `json:"features"`
-// }
-
 interface SearchResult {
 	id: number;
 	url: string;
@@ -71,6 +48,23 @@ interface SearchResult {
 }
 
 // Get rentals matching the search criteria
-export async function getRentals(apiBase: string) {
-	// First convert the fields to a query string
+export async function getRentals(apiBase: string, searchFields: SearchFields): Promise<SearchResult[]> {
+	// Convert the fields to a query string
+	let queryParams = `?page=${searchFields.page}`;
+
+	if (searchFields.location)
+		queryParams += `&latitude=${searchFields.location.latitude}&longitude=${searchFields.location.longitude}&radius=${searchFields.location.radius}`;
+	if (searchFields.price) queryParams += `&price=${searchFields.price}`;
+	if (searchFields.bond) queryParams += `&bond=${searchFields.bond}`;
+	if (searchFields.rentalType) queryParams += `&rentalType=${searchFields.rentalType}`;
+	if (searchFields.gender) queryParams += `&gender=${searchFields.gender}`;
+	if (searchFields.age) queryParams += `&age=${searchFields.age}`;
+	if (searchFields.duration) queryParams += `&duration=${searchFields.duration}`;
+	if (searchFields.tenant) queryParams += `&tenant=${searchFields.tenant}`;
+	if (searchFields.features) searchFields.features.forEach((feature) => (queryParams += `&feature=${feature}`));
+
+	// Make request
+	const { data } = await axios.get<SearchResult[]>(`${apiBase}/rentals${queryParams}`);
+
+	return data;
 }
