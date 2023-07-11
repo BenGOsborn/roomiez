@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { PUBLIC_API_ENDPOINT } from "$env/static/public";
 	import { getRentals } from "$lib/api";
-	import Query from "../components/Query.svelte";
+	import Query from "../components/Query/index.svelte";
 	import Rental from "../components/Rental.svelte";
 </script>
 
