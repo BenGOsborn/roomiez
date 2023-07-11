@@ -8,4 +8,5 @@ export const duration = writable<string>("");
 export const gender = writable<string>("");
 export const rentalType = writable<string>("");
 export const tenant = writable<string>("");
-export const feature = writable<{ [key: string]: boolean }>({});
+
+export const features = writable<{ [key: string]: boolean }>({});

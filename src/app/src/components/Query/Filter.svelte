@@ -5,9 +5,7 @@
 	export let values: string[];
 	export let store: Writable<string>;
 
-	const storeKey = `STORE:FEATURE:${name}`;
-
-	store.subscribe((value) => console.log(value));
+	const storeKey = `STORE:FILTER:${name}`;
 
 	const saved = localStorage.getItem(storeKey);
 	if (saved) store.set(saved);
