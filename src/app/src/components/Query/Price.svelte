@@ -27,8 +27,8 @@
 	<div class="flex flex-col space-y-2">
 		<label for="rent" class="text-gray-600 font-medium text-sm">Maximum weekly rent (AUD)</label>
 		<div class="flex items-center justify-between space-x-2">
-			<input id="rent" class="w-4/5" placeholder="Radius" type="range" min="0" max="5001" bind:value={$price} />
-			{#if $price <= 5000}
+			<input id="rent" class="w-4/5" placeholder="Radius" type="range" min="0" max="1501" bind:value={$price} />
+			{#if $price <= 1500}
 				<span class="font-medium text-gray-600">${$price.toLocaleString()}</span>
 			{:else}
 				<span class="font-medium text-gray-600">Any</span>
@@ -38,8 +38,8 @@
 	<div class="flex flex-col space-y-2">
 		<label for="rent" class="text-gray-600 font-medium text-sm">Maximum bond (AUD)</label>
 		<div class="flex items-center justify-between space-x-2">
-			<input class="w-4/5" placeholder="Radius" type="range" min="0" max="10001" bind:value={$bond} />
-			{#if $bond <= 10000}
+			<input class="w-4/5" placeholder="Radius" type="range" min="0" max="3001" bind:value={$bond} />
+			{#if $bond <= 3000}
 				<span class="font-medium text-gray-600">${$bond.toLocaleString()}</span>
 			{:else}
 				<span class="font-medium text-gray-600">Any</span>

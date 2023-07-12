@@ -96,7 +96,7 @@ func SearchRentals(db *gorm.DB, searchParams *SearchParams, perPage uint) (*[]Se
 	}
 
 	if searchParams.Latitude != nil && searchParams.Longitude != nil && searchParams.Radius != nil {
-		query = query.Where("ST_Distance(ST_GeomFromText(coordinates), POINT(?, ?)) <= ?", searchParams.Latitude, searchParams.Longitude, searchParams.Radius)
+		query = query.Where("ST_Distance_Sphere(ST_GeomFromText(coordinates), POINT(?, ?)) <= ?", searchParams.Longitude, searchParams.Latitude, searchParams.Radius)
 	}
 
 	query = query.Offset((int(searchParams.Page) - 1) * int(perPage)).Limit(int(perPage)).Order("rentals.created_at DESC")

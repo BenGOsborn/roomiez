@@ -1,44 +1,51 @@
 <script lang="ts">
 	import { PUBLIC_API_ENDPOINT } from "$env/static/public";
 	import { getRentals, type SearchFields } from "$lib/api";
-	import { derived } from "svelte/store";
+	import { derived, type Stores } from "svelte/store";
 	import Pagination from "../components/Pagination.svelte";
 	import Query from "../components/Query/index.svelte";
 	import Rental from "../components/Rental.svelte";
 
 	import { page, age, duration, features, gender, location, radius, rentalType, tenant, price, bond } from "../stores";
 
-	const searchFields = derived(
+	let timeoutId: number | null = null;
+	const searchFields = derived<Stores, SearchFields>(
 		[page, age, duration, features, gender, location, radius, rentalType, tenant, price, bond],
-		([$page, $age, $duration, $features, $gender, $location, $radius, $rentalType, $tenant, $price, $bond]): SearchFields => {
-			const _age = !!$age ? $age : null;
-			const _duration = !!$duration ? $duration : null;
-			const _gender = !!$gender ? $gender : null;
-			const _rentalType = !!$rentalType ? $rentalType : null;
-			const _tenant = !!$tenant ? $tenant : null;
+		([$page, $age, $duration, $features, $gender, $location, $radius, $rentalType, $tenant, $price, $bond], set) => {
+			if (timeoutId) clearTimeout(timeoutId);
 
-			const _location = !!$location ? { location: $location, radius: $radius } : null;
+			timeoutId = setTimeout(() => {
+				const _age = !!$age ? $age : null;
+				const _duration = !!$duration ? $duration : null;
+				const _gender = !!$gender ? $gender : null;
+				const _rentalType = !!$rentalType ? $rentalType : null;
+				const _tenant = !!$tenant ? $tenant : null;
 
-			const _price = $price <= 5000 ? $price : null;
-			const _bond = $bond <= 10000 ? $bond : null;
+				const _location = !!$location ? { location: $location, radius: $radius } : null;
 
-			const _features = Object.entries($features).reduce((prev, value) => {
-				if (value[1]) prev.push(value[0]);
-				return prev;
-			}, [] as string[]);
+				const _price = $price <= 1500 ? $price : null;
+				const _bond = $bond <= 3000 ? $bond : null;
 
-			return {
-				page: $page,
-				age: _age,
-				bond: _bond,
-				duration: _duration,
-				features: _features,
-				gender: _gender,
-				location: _location,
-				price: _price,
-				rentalType: _rentalType,
-				tenant: _tenant
-			};
+				const _features = Object.entries($features).reduce((prev, value) => {
+					if (value[1]) prev.push(value[0]);
+					return prev;
+				}, [] as string[]);
+
+				const searchFields: SearchFields = {
+					page: $page,
+					age: _age,
+					bond: _bond,
+					duration: _duration,
+					features: _features,
+					gender: _gender,
+					location: _location,
+					price: _price,
+					rentalType: _rentalType,
+					tenant: _tenant
+				};
+
+				set(searchFields);
+			}, 500);
 		}
 	);
 </script>

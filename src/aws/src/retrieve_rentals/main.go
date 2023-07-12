@@ -38,7 +38,7 @@ func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 	}
 
 	// Seach for rentals
-	searchParams, err := ParseQueryString(&request.MultiValueQueryStringParameters)
+	searchParams, err := ParseQueryString(ctx, env.AWSLocationPlaceIndex, &request.MultiValueQueryStringParameters)
 	if err != nil {
 		logger.Println(err)
 
@@ -70,25 +70,17 @@ func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 }
 
 // Parse the query string
-func ParseQueryString(queryString *map[string][]string) (*utils.SearchParams, error) {
+func ParseQueryString(ctx context.Context, placeIndexName string, queryString *map[string][]string) (*utils.SearchParams, error) {
 	searchParams := &utils.SearchParams{Page: 1}
 
-	if latitude, ok := (*queryString)["latitude"]; ok {
-		temp, err := strconv.ParseFloat(latitude[0], 64)
+	if location, ok := (*queryString)["location"]; ok {
+		latitude, longitude, err := utils.CoordsFromAddress(ctx, location[0], placeIndexName)
 		if err != nil {
 			return nil, err
 		}
 
-		searchParams.Latitude = &temp
-	}
-
-	if longitude, ok := (*queryString)["longitude"]; ok {
-		temp, err := strconv.ParseFloat(longitude[0], 64)
-		if err != nil {
-			return nil, err
-		}
-
-		searchParams.Longitude = &temp
+		searchParams.Latitude = &latitude
+		searchParams.Longitude = &longitude
 	}
 
 	if radius, ok := (*queryString)["radius"]; ok {
@@ -139,7 +131,7 @@ func ParseQueryString(queryString *map[string][]string) (*utils.SearchParams, er
 		searchParams.Tenant = &tenant[0]
 	}
 
-	if features, ok := (*queryString)["features"]; ok {
+	if features, ok := (*queryString)["feature"]; ok {
 		searchParams.Features = &features
 	}
 

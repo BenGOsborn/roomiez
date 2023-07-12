@@ -47,15 +47,20 @@ func TestSearchRentals(t *testing.T) {
 	t.Run("Geo search", func(t *testing.T) {
 		t.Helper()
 
-		latitude := 0.0
-		longitude := 0.0
-		var radius uint = 0
+		var radius uint = 1
+		latitude, longitude, err := utils.CoordsFromAddress(ctx, "Surry Hills, new south wales", env.AWSLocationPlaceIndex)
+		if err != nil {
+			t.Error(err)
+		}
+
+		t.Log("Latitude", latitude)
+		t.Log("Longitude", longitude)
 
 		rentals, err := utils.SearchRentals(db, &utils.SearchParams{Page: 1, Latitude: &latitude, Longitude: &longitude, Radius: &radius}, 10)
 		if err != nil {
 			t.Error(err)
-		} else if len(*rentals) != 0 {
-			t.Error("out of bounds records included")
+		} else if len(*rentals) == 0 {
+			t.Error("no records found")
 		}
 
 	})
