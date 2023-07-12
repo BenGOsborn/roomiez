@@ -19,7 +19,7 @@ export async function getFields(apiBase: string): Promise<Fields> {
 	return fieldsSchema.parse(data);
 }
 
-interface SearchFields {
+export interface SearchFields {
 	page: number;
 	location?: {
 		latitude: number;
