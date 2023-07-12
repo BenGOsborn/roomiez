@@ -50,5 +50,6 @@
 		width: 100%;
 		height: 400px;
 		border-radius: 0.375rem;
+		filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.1)) drop-shadow(0 1px 1px rgb(0 0 0 / 0.06));
 	}
 </style>
