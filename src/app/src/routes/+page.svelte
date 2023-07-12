@@ -5,11 +5,11 @@
 	import Pagination from "../components/Pagination.svelte";
 	import Query from "../components/Query/index.svelte";
 	import Rental from "../components/Rental.svelte";
-
 	import { page, age, duration, features, gender, location, radius, rentalType, tenant, price, bond } from "../stores";
 
 	let timeoutId: number | null = null;
-	const searchFields = derived<Stores, SearchFields>(
+
+	const searchFields = derived<Stores, SearchFields | undefined>(
 		[page, age, duration, features, gender, location, radius, rentalType, tenant, price, bond],
 		([$page, $age, $duration, $features, $gender, $location, $radius, $rentalType, $tenant, $price, $bond], set) => {
 			if (timeoutId) clearTimeout(timeoutId);
@@ -56,18 +56,20 @@
 			<Query />
 		</div>
 		<div class="w-3/4">
-			{#await getRentals(PUBLIC_API_ENDPOINT, $searchFields)}
-				<p class="text-center font-medium text-gray-800">Loading rentals...</p>
-			{:then rentals}
-				<div class="flex flex-col space-y-8">
-					<div class="grid grid-cols-2 gap-8">
-						{#each rentals as rental (rental.id)}
-							<Rental {rental} />
-						{/each}
+			{#if $searchFields}
+				{#await getRentals(PUBLIC_API_ENDPOINT, $searchFields)}
+					<p class="text-center font-medium text-gray-800">Loading rentals...</p>
+				{:then rentals}
+					<div class="flex flex-col space-y-8">
+						<div class="grid grid-cols-2 gap-8">
+							{#each rentals as rental (rental.id)}
+								<Rental {rental} />
+							{/each}
+						</div>
+						<Pagination />
 					</div>
-					<Pagination />
-				</div>
-			{/await}
+				{/await}
+			{/if}
 		</div>
 	</div>
 </div>

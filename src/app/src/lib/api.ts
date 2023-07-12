@@ -19,7 +19,6 @@ export async function getFields(apiBase: string): Promise<Fields> {
 	return fieldsSchema.parse(data);
 }
 
-// **** This needs to be changed to a location string
 export interface SearchFields {
 	page: number;
 	location: {
@@ -40,6 +39,7 @@ const searchResultSchema = z.object({
 	id: z.number(),
 	url: z.string(),
 	location: z.string().nullable(),
+	coordinates: z.string().nullable(),
 	price: z.number().nullable(),
 	bond: z.number().nullable(),
 	rentalType: z.string().nullable(),
