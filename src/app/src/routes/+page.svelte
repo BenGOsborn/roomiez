@@ -52,18 +52,18 @@
 </script>
 
 <div class="mx-auto w-4/5 mt-8">
-	<div class="flex justify-between space-x-8">
-		<div class="w-1/4">
+	<div class="flex justify-between md:space-x-8 md:space-y-0 space-y-8 flex-col md:flex-row">
+		<div class="md:w-1/4">
 			<Query />
 		</div>
-		<div class="w-3/4">
+		<div class="md:w-3/4">
 			{#if $searchFields}
 				{#await getRentals(PUBLIC_API_ENDPOINT, $searchFields)}
 					<p class="text-center font-medium text-gray-800">Loading rentals...</p>
 				{:then rentals}
 					<div class="flex flex-col space-y-8">
 						<Map {rentals} />
-						<div class="grid grid-cols-2 gap-8">
+						<div class="grid grid-cols-1 gap-8 xl:grid-cols-2">
 							{#each rentals as rental (rental.id)}
 								<Rental {rental} />
 							{/each}

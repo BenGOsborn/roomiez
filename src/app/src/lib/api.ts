@@ -10,7 +10,7 @@ const fieldsSchema = z.object({
 	feature: z.array(z.string())
 });
 
-type Fields = z.infer<typeof fieldsSchema>;
+export type Fields = z.infer<typeof fieldsSchema>;
 
 // Get the search fields
 export async function getFields(apiBase: string): Promise<Fields> {

@@ -10,6 +10,7 @@ import (
 func NewPostValidation(llm *openai.Chat) *chains.LLMChain {
 	prompt := prompts.NewPromptTemplate(`Please return 'yes' if the following post is advertising a shared rental property, and 'no' if otherwise. Some examples have been provided below to give you context.
 	For example, if the post is advertising a shared rental property the output should be yes.
+	If a post is advertising a rental but it is not a shared property the output should be no.
 	If the post indicates someone is looking for a shared rental property the output should be no.
 	Your response should be either 'yes' or 'no' on a new line after "Output:".
 

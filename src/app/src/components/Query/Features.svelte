@@ -31,7 +31,7 @@
 
 <div class="bg-white p-4 rounded-md flex flex-col space-y-4 drop-shadow">
 	<p class="text-gray-800 font-bold">Features</p>
-	<div class="grid grid-cols-2 gap-x-8 gap-y-4">
+	<div class="grid grid-cols-1 xl:grid-cols-2 gap-x-8 gap-y-4">
 		{#each features as feature}
 			<div class="flex items-center justify-between space-x-2">
 				<label class="text-gray-700" for={`feature:${feature}`}>{feature}</label>

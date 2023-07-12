@@ -13,7 +13,7 @@
 	store.subscribe((value) => localStorage.setItem(storeKey, value));
 </script>
 
-<div class="space-y-2">
+<div class="space-y-2 flex flex-col">
 	<p class="text-gray-800 font-medium text-sm">{name}</p>
 	<select class="text-gray-700" bind:value={$store}>
 		<option value="">Any</option>
