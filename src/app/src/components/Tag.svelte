@@ -1,7 +1,7 @@
 <script lang="ts">
 	export let text: string;
 
-	const colors = ["gray", "white", "green"] as const;
+	const colors = ["red", "rose", "gray"] as const;
 	type Colors = (typeof colors)[number];
 
 	function hash(text: string): Colors {
@@ -17,9 +17,9 @@
 	const color = hash(text);
 </script>
 
-{#if color === "gray"}
+{#if color === "red"}
 	<span class="py-1 px-2 rounded-md bg-red-200 text-red-400 font-medium">{text}</span>
-{:else if color === "white"}
+{:else if color === "rose"}
 	<span class="py-1 px-2 rounded-md bg-rose-300 text-rose-500 font-medium">{text}</span>
 {:else}
 	<span class="py-1 px-2 rounded-md bg-gray-300 text-gray-500 font-medium">{text}</span>

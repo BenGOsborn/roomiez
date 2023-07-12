@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { PUBLIC_API_ENDPOINT } from "$env/static/public";
 	import { getRentals } from "$lib/api";
+	import Pagination from "../components/Pagination.svelte";
 	import Query from "../components/Query/index.svelte";
 	import Rental from "../components/Rental.svelte";
 </script>
@@ -14,10 +15,13 @@
 			{#await getRentals(PUBLIC_API_ENDPOINT, { page: 1 })}
 				<p class="text-center font-medium text-gray-800">Loading rentals...</p>
 			{:then rentals}
-				<div class="grid grid-cols-2 gap-8">
-					{#each rentals as rental (rental.id)}
-						<Rental {rental} />
-					{/each}
+				<div class="flex flex-col space-y-8">
+					<div class="grid grid-cols-2 gap-8">
+						{#each rentals as rental (rental.id)}
+							<Rental {rental} />
+						{/each}
+					</div>
+					<Pagination />
 				</div>
 			{/await}
 		</div>

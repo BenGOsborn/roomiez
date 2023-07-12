@@ -25,5 +25,8 @@
 <div class="bg-white p-4 rounded-md flex flex-col space-y-4 drop-shadow">
 	<p class="text-gray-800 font-bold">Location</p>
 	<input class="outline-none px-2 py-1 border border-gray-300 rounded-md text-gray-600" placeholder="Location" type="text" bind:value={$location} />
-	<input placeholder="Radius" type="range" min="1" max="10" bind:value={$radius} />
+	<div class="flex items-center justify-between space-x-2">
+		<input class="w-4/5" placeholder="Radius" type="range" min="1" max="10" bind:value={$radius} />
+		<span class="font-medium text-gray-600">{$radius} km</span>
+	</div>
 </div>

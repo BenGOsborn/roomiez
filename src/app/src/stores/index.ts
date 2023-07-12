@@ -1,5 +1,9 @@
 import { writable } from "svelte/store";
 
+export const email = writable<string>("");
+
+export const page = writable<number>(1);
+
 export const location = writable<string>("");
 export const radius = writable<number>(1);
 
