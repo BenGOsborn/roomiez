@@ -99,7 +99,7 @@ func SearchRentals(db *gorm.DB, searchParams *SearchParams, perPage uint) (*[]Se
 		query = query.Where("ST_Distance(ST_GeomFromText(coordinates), POINT(?, ?)) <= ?", searchParams.Latitude, searchParams.Longitude, searchParams.Radius)
 	}
 
-	query = query.Offset((int(searchParams.Page) - 1) * int(perPage)).Limit(int(perPage))
+	query = query.Offset((int(searchParams.Page) - 1) * int(perPage)).Limit(int(perPage)).Order("rentals.created_at DESC")
 
 	rentalResults := &[]RentalResult{}
 	if err := query.Find(rentalResults).Error; err != nil {
