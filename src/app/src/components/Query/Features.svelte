@@ -34,8 +34,18 @@
 	<div class="grid grid-cols-2 gap-x-8 gap-y-4">
 		{#each features as feature}
 			<div class="flex items-center justify-between space-x-2">
-				<span class="text-gray-700">{feature}</span>
-				<input value={feature} type="checkbox" />
+				<label class="text-gray-700" for={`feature:${feature}`}>{feature}</label>
+				<input
+					id={`feature:${feature}`}
+					value={feature}
+					type="checkbox"
+					checked={$featuresStore[feature]}
+					on:change={() =>
+						featuresStore.update((map) => {
+							map[feature] = !map[feature];
+							return map;
+						})}
+				/>
 			</div>
 		{/each}
 	</div>
