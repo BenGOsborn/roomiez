@@ -45,8 +45,6 @@ func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 		return nil, err
 	}
 
-	logger.Println(searchParams)
-
 	rentals, err := utils.SearchRentals(db, searchParams, PageSize)
 	if err != nil {
 		logger.Println(err)
@@ -59,7 +57,7 @@ func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 		return nil, err
 	}
 
-	logger.Println(body)
+	logger.Println(string(body))
 
 	return &events.APIGatewayProxyResponse{
 		StatusCode: http.StatusOK,

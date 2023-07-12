@@ -47,7 +47,7 @@ func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 		return nil, err
 	}
 
-	logger.Println(body)
+	logger.Println(string(body))
 
 	return &events.APIGatewayProxyResponse{
 		StatusCode: http.StatusOK,
