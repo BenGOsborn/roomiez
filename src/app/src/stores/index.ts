@@ -7,6 +7,9 @@ export const page = writable<number>(1);
 export const location = writable<string>("");
 export const radius = writable<number>(1);
 
+export const price = writable<number>(5001);
+export const bond = writable<number>(10001);
+
 export const age = writable<string>("");
 export const duration = writable<string>("");
 export const gender = writable<string>("");

@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { email as emailStore } from "../stores";
 
-	const SUBSCRIPTION_ID = "subscription";
 	const STORE_KEY = "STORE:EMAIL";
 
 	let email: string;
@@ -21,10 +20,10 @@
 		<ul class="flex space-x-4">
 			<li>
 				<div class="flex flex-col space-y-2">
-					<label for={SUBSCRIPTION_ID} class="text-white font-medium text-sm">Get personalized rentals delivered to your inbox every week.</label>
+					<label for="subscription" class="text-white font-medium text-sm">Get personalized rentals delivered to your inbox every week.</label>
 					<div class="flex justify-between space-x-2">
 						<input
-							id={SUBSCRIPTION_ID}
+							id="subscription"
 							class="w-4/5 outline-none px-2 py-1 border border-gray-300 rounded-md text-gray-600"
 							placeholder="johndoe@mail.com"
 							type="email"

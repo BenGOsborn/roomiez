@@ -19,21 +19,21 @@ export async function getFields(apiBase: string): Promise<Fields> {
 	return fieldsSchema.parse(data);
 }
 
+// **** This needs to be changed to a location string
 export interface SearchFields {
 	page: number;
-	location?: {
-		latitude: number;
-		longitude: number;
+	location: {
+		location: string;
 		radius: number;
-	};
-	price?: number;
-	bond?: number;
-	rentalType?: string;
-	gender?: string;
-	age?: string;
-	duration?: string;
-	tenant?: string;
-	features?: string[];
+	} | null;
+	price: number | null;
+	bond: number | null;
+	rentalType: string | null;
+	gender: string | null;
+	age: string | null;
+	duration: string | null;
+	tenant: string | null;
+	features: string[] | null;
 }
 
 const searchResultSchema = z.object({
@@ -57,8 +57,7 @@ export async function getRentals(apiBase: string, searchFields: SearchFields): P
 	// Convert the fields to a query string
 	let queryParams = `?page=${searchFields.page}`;
 
-	if (searchFields.location)
-		queryParams += `&latitude=${searchFields.location.latitude}&longitude=${searchFields.location.longitude}&radius=${searchFields.location.radius}`;
+	if (searchFields.location) queryParams += `&location=${searchFields.location.location}&radius=${searchFields.location.radius}`;
 	if (searchFields.price) queryParams += `&price=${searchFields.price}`;
 	if (searchFields.bond) queryParams += `&bond=${searchFields.bond}`;
 	if (searchFields.rentalType) queryParams += `&rentalType=${searchFields.rentalType}`;

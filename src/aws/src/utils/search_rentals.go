@@ -62,31 +62,31 @@ func SearchRentals(db *gorm.DB, searchParams *SearchParams, perPage uint) (*[]Se
 		Joins("LEFT JOIN tenants ON rentals.tenant_id = tenants.id")
 
 	if searchParams.Price != nil {
-		query = query.Where("price < ?", searchParams.Price)
+		query = query.Where("price <= ?", searchParams.Price)
 	}
 
 	if searchParams.Bond != nil {
-		query = query.Where("bond < ?", searchParams.Bond)
+		query = query.Where("bond <= ?", searchParams.Bond)
 	}
 
 	if searchParams.RentalType != nil {
-		query = query.Where("rental_type = ?", searchParams.RentalType)
+		query = query.Where("rental_types.type = ?", searchParams.RentalType)
 	}
 
 	if searchParams.Gender != nil {
-		query = query.Where("gender_preference = ?", searchParams.Gender)
+		query = query.Where("genders.preference = ?", searchParams.Gender)
 	}
 
 	if searchParams.Age != nil {
-		query = query.Where("age_preference = ?", searchParams.Age)
+		query = query.Where("ages.preference = ?", searchParams.Age)
 	}
 
 	if searchParams.Duration != nil {
-		query = query.Where("duration_preference = ?", searchParams.Duration)
+		query = query.Where("durations.preference = ?", searchParams.Duration)
 	}
 
 	if searchParams.Tenant != nil {
-		query = query.Where("tenant_preference = ?", searchParams.Tenant)
+		query = query.Where("tenants.preference = ?", searchParams.Tenant)
 	}
 
 	if searchParams.Features != nil {

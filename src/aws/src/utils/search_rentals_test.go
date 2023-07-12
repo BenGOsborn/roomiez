@@ -47,24 +47,41 @@ func TestSearchRentals(t *testing.T) {
 	t.Run("Geo search", func(t *testing.T) {
 		t.Helper()
 
-		var perPage uint = 10
-
 		latitude := 0.0
 		longitude := 0.0
 		var radius uint = 0
 
-		rentals, err := utils.SearchRentals(db, &utils.SearchParams{Page: 1, Latitude: &latitude, Longitude: &longitude, Radius: &radius}, perPage)
+		rentals, err := utils.SearchRentals(db, &utils.SearchParams{Page: 1, Latitude: &latitude, Longitude: &longitude, Radius: &radius}, 10)
 		if err != nil {
 			t.Error(err)
 		} else if len(*rentals) != 0 {
 			t.Error("out of bounds records included")
 		}
 
-		rentals, err = utils.SearchRentals(db, &utils.SearchParams{Page: 1, Features: &[]string{"Mattress", "WiFi"}}, perPage)
+	})
+
+	t.Run("Features", func(t *testing.T) {
+		t.Helper()
+
+		rentals, err := utils.SearchRentals(db, &utils.SearchParams{Page: 1, Features: &[]string{"Mattress", "WiFi"}}, 10)
 		if err != nil {
 			t.Error(err)
 		} else if len(*rentals) == 0 {
 			t.Error("no records found")
+		}
+	})
+
+	t.Run("Filters", func(t *testing.T) {
+		t.Helper()
+
+		age := "Young"
+		tenantType := "Singles"
+		duration := "Long Term"
+		rentalType := "Apartment"
+		gender := "Female"
+
+		if _, err := utils.SearchRentals(db, &utils.SearchParams{Page: 1, Age: &age, Tenant: &tenantType, Duration: &duration, RentalType: &rentalType, Gender: &gender}, 10); err != nil {
+			t.Error(err)
 		}
 	})
 }

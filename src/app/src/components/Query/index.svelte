@@ -5,6 +5,7 @@
 	import Features from "./Features.svelte";
 	import Filter from "./Filter.svelte";
 	import { age, duration, gender, rentalType, tenant } from "../../stores";
+	import Price from "./Price.svelte";
 </script>
 
 {#await getFields(PUBLIC_API_ENDPOINT)}
@@ -12,6 +13,7 @@
 {:then fields}
 	<div class="space-y-8">
 		<Location />
+		<Price />
 		<div class="bg-white p-4 rounded-md flex flex-col space-y-4 drop-shadow">
 			<p class="text-gray-800 font-bold">Filters</p>
 			<div class="grid grid-cols-2 gap-4">

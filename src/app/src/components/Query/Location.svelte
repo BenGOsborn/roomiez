@@ -18,8 +18,8 @@
 		radius.set(state.radius);
 	}
 
-	location.subscribe((loc) => localStorage.setItem(STORE_KEY, JSON.stringify({ location: loc, radius: $radius } as State)));
-	radius.subscribe((rad) => localStorage.setItem(STORE_KEY, JSON.stringify({ location: $location, radius: rad } as State)));
+	location.subscribe((value) => localStorage.setItem(STORE_KEY, JSON.stringify({ location: value, radius: $radius } as State)));
+	radius.subscribe((value) => localStorage.setItem(STORE_KEY, JSON.stringify({ location: $location, radius: value } as State)));
 </script>
 
 <div class="bg-white p-4 rounded-md flex flex-col space-y-4 drop-shadow">
