@@ -16,7 +16,7 @@ import (
 
 const (
 	CentreLongitude = 151.2093
-	CentreLatitude  = 33.8688
+	CentreLatitude  = -33.8688
 )
 
 type RentalSchema struct {

@@ -6,6 +6,7 @@
 	import Query from "../components/Query/index.svelte";
 	import Rental from "../components/Rental.svelte";
 	import { page, age, duration, features, gender, location, radius, rentalType, tenant, price, bond } from "../stores";
+	import Map from "../components/Map.svelte";
 
 	let timeoutId: number | null = null;
 
@@ -61,6 +62,7 @@
 					<p class="text-center font-medium text-gray-800">Loading rentals...</p>
 				{:then rentals}
 					<div class="flex flex-col space-y-8">
+						<Map {rentals} />
 						<div class="grid grid-cols-2 gap-8">
 							{#each rentals as rental (rental.id)}
 								<Rental {rental} />

@@ -17,3 +17,5 @@ export const rentalType = writable<string>("");
 export const tenant = writable<string>("");
 
 export const features = writable<{ [key: string]: boolean }>({});
+
+export const mapReady = writable<boolean>(false);
