@@ -56,26 +56,7 @@ resource "aws_api_gateway_usage_plan_key" "usage_plan_key" {
   usage_plan_id = aws_api_gateway_usage_plan.usage_plan.id
 }
 
-# Roles
-
-resource "aws_iam_role" "lambda_role" {
-  name = "lambda-role"
-
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Principal": {
-        "Service": "lambda.amazonaws.com"
-      },
-      "Action": "sts:AssumeRole"
-    }
-  ]
-}
-EOF
-}
+# Policies
 
 data "aws_iam_policy_document" "secrets_manager_policy" {
   statement {
@@ -90,11 +71,6 @@ resource "aws_iam_policy" "secrets_manager_policy" {
   policy = data.aws_iam_policy_document.secrets_manager_policy.json
 }
 
-resource "aws_iam_role_policy_attachment" "lambda_secrets_manager_policy" {
-  role       = aws_iam_role.lambda_role.name
-  policy_arn = aws_iam_policy.secrets_manager_policy.arn
-}
-
 data "aws_iam_policy_document" "location_policy" {
   statement {
     effect    = "Allow"
@@ -106,14 +82,4 @@ data "aws_iam_policy_document" "location_policy" {
 resource "aws_iam_policy" "location_policy" {
   name   = "location-policy"
   policy = data.aws_iam_policy_document.location_policy.json
-}
-
-resource "aws_iam_role_policy_attachment" "lambda_location_policy" {
-  role       = aws_iam_role.lambda_role.name
-  policy_arn = aws_iam_policy.location_policy.arn
-}
-
-resource "aws_iam_role_policy_attachment" "basic" {
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-  role       = aws_iam_role.lambda_role.name
 }
