@@ -6,7 +6,7 @@
 </script>
 
 <div class="bg-white p-4 rounded-md flex flex-col space-y-4 drop-shadow">
-	<a class="text-blue-700 font-medium underline" href={rental.url} target="_blank" rel="nofollow">View original post</a>
+	<a class="text-blue-700 font-medium underline" href={rental.url} target="_blank" rel="nofollow">View original post and images</a>
 	<p class="text-gray-800 font-bold text-lg">About</p>
 	<p class="text-gray-500">{rental.description}</p>
 	<p class="text-gray-800 font-bold">Features</p>

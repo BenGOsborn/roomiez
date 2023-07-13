@@ -68,6 +68,7 @@ func TestHandleRequest(t *testing.T) {
 		price := 270
 		bond := 1080
 		location := "Drummoyne"
+		description := "Room available in a 3-bedroom apartment in Drummoyne. Price is $270/week and bond is $1080. Looking for a female in their mid to late 20s/early 30s who values cleanliness and organization. Shared bathroom, balcony access. Bills to be split evenly. Open for inspections on 8th July."
 		rentalType := "Apartment"
 		gender := "Female"
 		age := "Young"
@@ -76,15 +77,18 @@ func TestHandleRequest(t *testing.T) {
 		features := []string{"WiFi"}
 
 		rental := &utils.RentalSchema{
-			Price:      &price,
-			Bond:       &bond,
-			Location:   &location,
-			RentalType: &rentalType,
-			Gender:     &gender,
-			Age:        &age,
-			Duration:   &duration,
-			Tenant:     &tenant,
-			Features:   features,
+			PostSchema: utils.PostSchema{
+				Price:      &price,
+				Bond:       &bond,
+				Location:   &location,
+				RentalType: &rentalType,
+				Gender:     &gender,
+				Age:        &age,
+				Duration:   &duration,
+				Tenant:     &tenant,
+				Features:   &features,
+			},
+			Description: description,
 		}
 
 		if err := utils.SaveRental(ctx, db, rental, url, env.AWSLocationPlaceIndex); err != nil {

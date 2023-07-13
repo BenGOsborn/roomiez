@@ -19,7 +19,7 @@ export async function getFields(apiBase: string): Promise<Fields> {
 	return fieldsSchema.parse(data);
 }
 
-export interface SearchFields {
+export interface SearchParams {
 	page: number;
 	location: {
 		location: string;
@@ -54,19 +54,19 @@ const searchResultSchema = z.object({
 export type SearchResult = z.infer<typeof searchResultSchema>;
 
 // Get rentals matching the search criteria
-export async function getRentals(apiBase: string, searchFields: SearchFields): Promise<SearchResult[]> {
+export async function getRentals(apiBase: string, searchParams: SearchParams): Promise<SearchResult[]> {
 	// Convert the fields to a query string
-	let queryParams = `?page=${searchFields.page}`;
+	let queryParams = `?page=${searchParams.page}`;
 
-	if (searchFields.location) queryParams += `&location=${searchFields.location.location}&radius=${searchFields.location.radius}`;
-	if (searchFields.price) queryParams += `&price=${searchFields.price}`;
-	if (searchFields.bond) queryParams += `&bond=${searchFields.bond}`;
-	if (searchFields.rentalType) queryParams += `&rentalType=${searchFields.rentalType}`;
-	if (searchFields.gender) queryParams += `&gender=${searchFields.gender}`;
-	if (searchFields.age) queryParams += `&age=${searchFields.age}`;
-	if (searchFields.duration) queryParams += `&duration=${searchFields.duration}`;
-	if (searchFields.tenant) queryParams += `&tenant=${searchFields.tenant}`;
-	if (searchFields.features) searchFields.features.forEach((feature) => (queryParams += `&feature=${feature}`));
+	if (searchParams.location) queryParams += `&location=${searchParams.location.location}&radius=${searchParams.location.radius}`;
+	if (searchParams.price) queryParams += `&price=${searchParams.price}`;
+	if (searchParams.bond) queryParams += `&bond=${searchParams.bond}`;
+	if (searchParams.rentalType) queryParams += `&rentalType=${searchParams.rentalType}`;
+	if (searchParams.gender) queryParams += `&gender=${searchParams.gender}`;
+	if (searchParams.age) queryParams += `&age=${searchParams.age}`;
+	if (searchParams.duration) queryParams += `&duration=${searchParams.duration}`;
+	if (searchParams.tenant) queryParams += `&tenant=${searchParams.tenant}`;
+	if (searchParams.features) searchParams.features.forEach((feature) => (queryParams += `&feature=${feature}`));
 
 	// Make request
 	const { data } = await axios.get<SearchResult[]>(`${apiBase}/rentals${queryParams}`);

@@ -20,15 +20,15 @@ const (
 )
 
 type PostSchema struct {
-	Price      *int     `json:"price"`
-	Bond       *int     `json:"bond"`
-	Location   *string  `json:"location"`
-	RentalType *string  `json:"rentalType"`
-	Gender     *string  `json:"gender"`
-	Age        *string  `json:"age"`
-	Duration   *string  `json:"duration"`
-	Tenant     *string  `json:"tenant"`
-	Features   []string `json:"features"`
+	Price      *int      `json:"price"`
+	Bond       *int      `json:"bond"`
+	Location   *string   `json:"location"`
+	RentalType *string   `json:"rentalType"`
+	Gender     *string   `json:"gender"`
+	Age        *string   `json:"age"`
+	Duration   *string   `json:"duration"`
+	Tenant     *string   `json:"tenant"`
+	Features   *[]string `json:"features"`
 }
 
 type RentalSchema struct {
@@ -174,7 +174,7 @@ func SaveRental(ctx context.Context, db *gorm.DB, rental *RentalSchema, url stri
 		newRental.TenantID = &tenant.ID
 	}
 
-	if len(rental.Features) > 0 {
+	if len(*rental.Features) > 0 {
 		existingFeatures := []Feature{}
 		if err := db.Find(&existingFeatures, "name IN ?", rental.Features).Error; err != nil {
 			return err
