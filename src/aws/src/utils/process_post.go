@@ -19,7 +19,7 @@ const (
 	CentreLatitude  = -33.8688
 )
 
-type RentalSchema struct {
+type PostSchema struct {
 	Price      *int     `json:"price"`
 	Bond       *int     `json:"bond"`
 	Location   *string  `json:"location"`
@@ -29,6 +29,11 @@ type RentalSchema struct {
 	Duration   *string  `json:"duration"`
 	Tenant     *string  `json:"tenant"`
 	Features   []string `json:"features"`
+}
+
+type RentalSchema struct {
+	PostSchema
+	Description string `json:"description"`
 }
 
 func (r *RentalSchema) String() string {
@@ -56,10 +61,18 @@ func ProcessPost(ctx context.Context, llm *openai.Chat, post string) (*RentalSch
 		return nil, err
 	}
 
-	rental := &RentalSchema{}
-	if err := json.Unmarshal([]byte(rawData), rental); err != nil {
+	postData := PostSchema{}
+	if err := json.Unmarshal([]byte(rawData), &postData); err != nil {
 		return nil, err
 	}
+
+	descriptionChain := NewPostDescription(llm)
+	description, err := chains.Run(ctx, descriptionChain, post, chains.WithTemperature(0.4))
+	if err != nil {
+		return nil, err
+	}
+
+	rental := &RentalSchema{PostSchema: postData, Description: description}
 
 	return rental, nil
 }
@@ -101,6 +114,7 @@ func SaveRental(ctx context.Context, db *gorm.DB, rental *RentalSchema, url stri
 	newRental.URL = url
 	newRental.Price = rental.Price
 	newRental.Bond = rental.Bond
+	newRental.Description = rental.Description
 
 	if rental.Location != nil {
 		latitude, longitude, err := CoordsFromAddress(ctx, *rental.Location, placeIndexName)

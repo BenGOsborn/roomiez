@@ -38,6 +38,7 @@ export interface SearchFields {
 const searchResultSchema = z.object({
 	id: z.number(),
 	url: z.string(),
+	description: z.string(),
 	location: z.string().nullable(),
 	coordinates: z.string().nullable(),
 	price: z.number().nullable(),

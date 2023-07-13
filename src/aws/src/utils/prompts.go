@@ -156,3 +156,71 @@ func NewPostExtraction(llm *openai.Chat) *chains.LLMChain {
 
 	return chains.NewLLMChain(llm, prompt)
 }
+
+// Create a prompt for post summarization
+func NewPostDescription(llm *openai.Chat) *chains.LLMChain {
+	prompt := prompts.NewPromptTemplate(`Given the following post, please summarize it into a very short paragraph (less than 60 words). You will return
+	Make sure to include the price, bond, and location if they exist, as well as any other important information mentioned in the post (e.g. age preference, gender preference, whether it is a house or apartment).
+	Only include the relevant information about the rental, don't include anything along the lines of "DM for details" or "Message owner".
+	Your response should be a summary string on a new line after "Summary:".
+
+	Some examples have been provided below to give you context.
+
+	Examples:
+
+	Post:
+	LIVE BY THE BEACH, Maroubra
+	Short term room for rent, $300/week includ bills, bond $1080
+	Looking for a girl to live with us from 
+	Saturday July 15th - August 26th 
+	$300/week including bills (electricity, gas and wifi) 
+	Furnished bedroom with queen bed 
+	House fully furnished
+	You'll be living with 2 working girls in their early 30s
+	Bus to city outside of the door - 396, 396x, 397 
+	10 min walk to Maroubra Beach 
+	5 min walk to Maroubra Junction - Coles, Aldi, Chemist Warehouse other buses to Bondi Junction, Airport 
+	Free street parking, can always find parking
+	DM for more details!	
+	Summary:
+	Short term room for rent in Maroubra. Price is $300/week and bond is $1080. Looking for a girl to live with two working girls in their early 30s.
+	Bus to city outside, 10 min walk to Maroubra Beach. 5 min walk to Maroubra Junction. Free street parking.
+
+	Post:
+	📍Sydney Olympic Park
+	🎡🎡🎡MASTER ROOM AVAILABLE 🎡🎡🎡
+	Negotiable for single
+	👌all bills included 
+	🛜Internet✅
+	🛁Own bathroom✅
+	2 Wardrobe✅ 
+	Comfortable new Bed✅
+	study desk
+	🛒 Close to IGA
+	🚏Bus stop 2 min
+	🚊Train station 6 min
+	🔑Security
+	📍Minimum stay 3-6 months
+	👍2weeks bond 
+	👍🏻2 weeks rent in advance 
+	🌲🌲🌲  Beautiful park to walk and do barbecue no need to go far away to have a picnic
+	🎓study room, 
+	😀 very clean, nice and calm environment 
+	🏡 private balcony 
+	🚭No smoke 
+	🍾No party
+	🐶No pet
+	📍the room has a great view, quiet, comfy and privacy.
+	Please kindly send me chat 480$ per week included bills.💕
+	Summary:
+	Master room available in Sydney Olympic Park for a minimum stay of 3-6 months. Price is $480/week and bond is 2 weeks. All bills included.
+	Own bathroom, 2 wardrobes, comfortable new bed, study desk, and private balcony. Close to IGA, bus stop, and train station.
+	No smoking, no pets, no parties. Beautiful park nearby.
+
+	Post:
+	{{.post}}
+	Summary:
+	`, []string{"post"})
+
+	return chains.NewLLMChain(llm, prompt)
+}

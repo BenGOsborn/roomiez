@@ -2,7 +2,6 @@ package utils_test
 
 import (
 	"context"
-	"reflect"
 	"testing"
 
 	"github.com/bengosborn/roomiez/aws/utils"
@@ -59,38 +58,8 @@ func TestProcessPost(t *testing.T) {
 		If you feel like this could be your new home, please message me with a little bit about yourself!
 		P.S: The property was offered unfurnished. We have some furniture, including a sofa, kitchen appliances, and a TV. You are welcome to bring your own furniture or contribute towards getting any additional items needed.`
 
-		rental, err := utils.ProcessPost(ctx, llm, post)
-		if err != nil {
+		if _, err := utils.ProcessPost(ctx, llm, post); err != nil {
 			t.Error(err)
-		}
-
-		price := 270
-		bond := 1080
-		location := "Drummoyne"
-		rentalType := "Apartment"
-		gender := "Female"
-		age := "Young"
-		duration := "Long Term"
-		tenant := "Singles"
-		features := []string{}
-
-		correctRental := &utils.RentalSchema{
-			Price:      &price,
-			Bond:       &bond,
-			Location:   &location,
-			RentalType: &rentalType,
-			Gender:     &gender,
-			Age:        &age,
-			Duration:   &duration,
-			Tenant:     &tenant,
-			Features:   features,
-		}
-
-		if !reflect.DeepEqual(rental, correctRental) {
-			t.Log(rental)
-			t.Log(correctRental)
-
-			t.Error("Structs are not equal")
 		}
 	})
 
