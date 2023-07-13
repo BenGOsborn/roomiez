@@ -78,7 +78,7 @@
 		{/if}
 	</div>
 	<div class="flex items-center justify-between space-x-2">
-		<input class="w-4/5" placeholder="Radius" type="range" min="1" max="10" bind:value={$radius} />
+		<input class="w-4/5" placeholder="Radius" type="range" min="1" max="30" bind:value={$radius} />
 		<span class="font-medium text-gray-600">{$radius} km</span>
 	</div>
 </div>

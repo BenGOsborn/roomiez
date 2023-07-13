@@ -16,6 +16,7 @@ type Env struct {
 	OpenAIAPIKey          string `json:"OPENAI_API_KEY"`
 	AWSLocationPlaceIndex string `json:"AWS_LOCATION_PLACE_INDEX"`
 	SendGridAPIKey        string `json:"SENDGRID_API_KEY"`
+	SendGridTemplateId    string `json:"SENDGRID_TEMPLATE_ID"`
 }
 
 // Load environment variables from secrets
