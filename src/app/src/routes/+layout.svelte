@@ -28,11 +28,8 @@
 	</script>
 	<script async src={`https://www.googletagmanager.com/gtag/js?id=${PUBLIC_GA_ID}`}></script>
 
-	<title>Roomiesz - Find A Shared Rental</title>
-	<meta
-		name="description"
-		content="Easily explore shared rentals on Facebook groups, customized to your preferred location and budget. Find your ideal living space with our welcoming platform, connecting you to the perfect accommodation."
-	/>
+	<title>Roomiez - Find A Shared Rental</title>
+	<meta name="description" content="Roomiez allows you to easily explore shared rentals on Facebook groups, customized to your preferred location and budget." />
 </svelte:head>
 
 <Nav />
