@@ -24,15 +24,12 @@
 
 	let autocomplete: any = null;
 	let completions: string[] = [];
-	let closeCompletions: boolean = false;
+	let focused: boolean;
 
 	let timeoutId: number | null = null;
 
 	location.subscribe((value) => {
-		if (closeCompletions) {
-			completions = [];
-			closeCompletions = false;
-		} else if (autocomplete && !!value) {
+		if (autocomplete && !!value) {
 			if (timeoutId) clearTimeout(timeoutId);
 
 			timeoutId = setTimeout(() => {
@@ -57,16 +54,22 @@
 <div class="bg-white p-4 rounded-md flex flex-col space-y-4 drop-shadow z-50">
 	<p class="text-gray-800 font-bold">Location</p>
 	<div class="relative">
-		<input class="w-full outline-none px-2 py-1 border border-gray-300 rounded-md text-gray-600" placeholder="Location" type="text" bind:value={$location} />
-		{#if completions.length > 0 && !!$location}
+		<input
+			on:focus={() => (focused = true)}
+			class="w-full outline-none px-2 py-1 border border-gray-300 rounded-md text-gray-600"
+			placeholder="Location"
+			type="text"
+			bind:value={$location}
+		/>
+		{#if completions.length > 0 && !!$location && focused}
 			<ul class="absolute rounded-md drop-shadow bg-white w-full p-2 space-y-2">
 				{#each completions as completion}
 					<li>
 						<button
 							class="text-gray-500 hover:text-gray-700 text-left"
 							on:click={() => {
-								closeCompletions = true;
 								location.set(completion);
+								focused = false;
 							}}>{completion}</button
 						>
 					</li>

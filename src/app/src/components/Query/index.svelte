@@ -20,7 +20,7 @@
 	</div>
 	<div class="space-y-8 flex md:hidden flex-col">
 		<div class="flex items-center justify-between">
-			<p class="text-gray-800 font-medium">Search Options</p>
+			<p class="text-gray-800 font-bold">Search Options</p>
 			<button class="py-1 px-2 rounded-md bg-gray-200 text-gray-500 font-medium hover:bg-gray-300" on:click={() => (hidden = !hidden)}>{hidden ? "Show" : "Hide"}</button>
 		</div>
 		{#if !hidden}
