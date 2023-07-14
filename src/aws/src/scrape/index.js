@@ -28,8 +28,15 @@ exports.handler = async (event, context) => {};
 
     // **** If it works we will loop through this by scrolling down N times
     const html = await page.evaluate(async () => {
-        const elements = Array.from(document.querySelector('[role="feed"]').children).slice(1);
         const out = [];
+
+        for (let i = 0; i < 2; i++) {
+            window.scrollTo(0, document.body.scrollHeight);
+            await new Promise((res) => setTimeout(res, 5000));
+        }
+
+        const elements = Array.from(document.querySelector('[role="feed"]').children);
+        return elements.length;
 
         for (const elem of elements) {
             const msg = elem.querySelector('[data-ad-comet-preview="message"]');
