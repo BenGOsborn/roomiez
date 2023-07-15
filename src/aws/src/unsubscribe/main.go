@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 	"os"
@@ -12,10 +12,6 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 )
-
-type Body struct {
-	ID string `json:"id"`
-}
 
 func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
 	// Load requirements
@@ -33,15 +29,16 @@ func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 	svc := dynamodb.New(sess)
 
 	// Extract email
-	body := &Body{}
-	if err := json.Unmarshal([]byte(request.Body), body); err != nil {
-		logger.Println(err)
+	id, ok := request.QueryStringParameters["id"]
+	if !ok {
+		err := errors.New("id not included in query string")
+		logger.Panicln(err)
 
 		return nil, err
 	}
 
 	// Delete record from dynamodb
-	if _, err := svc.DeleteItem(&dynamodb.DeleteItemInput{Key: map[string]*dynamodb.AttributeValue{"ID": {S: &body.ID}}, TableName: &table}); err != nil {
+	if _, err := svc.DeleteItem(&dynamodb.DeleteItemInput{Key: map[string]*dynamodb.AttributeValue{"ID": {S: &id}}, TableName: &table}); err != nil {
 		logger.Println(err)
 
 		return nil, err

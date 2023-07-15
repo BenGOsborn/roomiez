@@ -153,12 +153,12 @@ resource "aws_iam_role_policy_attachment" "process_rental_lambda_basic" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
-resource "aws_iam_role_policy_attachment" "process_rental_lambda_secrets_manager_policy" {
+resource "aws_iam_role_policy_attachment" "process_rental_lambda_secrets_manager" {
   role       = aws_iam_role.process_rental_lambda_role.name
   policy_arn = aws_iam_policy.secrets_manager_policy.arn
 }
 
-resource "aws_iam_role_policy_attachment" "process_rental_lambda_location_policy" {
+resource "aws_iam_role_policy_attachment" "process_rental_lambda_location" {
   role       = aws_iam_role.process_rental_lambda_role.name
   policy_arn = aws_iam_policy.location_policy.arn
 }
