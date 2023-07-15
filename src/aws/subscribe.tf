@@ -107,3 +107,4 @@ resource "aws_iam_policy" "subscriptions_dynamo_policy" {
   policy = data.aws_iam_policy_document.subscriptions_dynamo_policy.json
 }
 
+# **** Add endpoint for unsubscribe (add to ./run as well)
