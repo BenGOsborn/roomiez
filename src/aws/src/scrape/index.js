@@ -32,6 +32,9 @@ exports.handler = async (event, context, callback) => {
             ignoreHTTPSErrors: true,
         });
 
+        const context = await browser.defaultBrowserContext();
+        await context.overridePermissions("https://facebook.com", ["clipboard-read"]);
+
         let page = await browser.newPage();
         page.setDefaultNavigationTimeout(2 * 60 * 1000);
 
@@ -51,7 +54,6 @@ exports.handler = async (event, context, callback) => {
         for (let i = 0; i < 1; i++) await page.keyboard.press("PageDown");
         await page.waitFor(3000);
 
-        // **** This code mostly needs to be converted to puppeteer code instead (especially for the URL scraping)
         const out = await page.evaluate(async () => {
             const out = [];
 
@@ -59,26 +61,20 @@ exports.handler = async (event, context, callback) => {
                 const msg = elem.querySelector("[data-ad-comet-preview=message]");
 
                 // Get the post URL
-                const url = await new Promise((res) => {
-                    elem.querySelector('[aria-label="Send this to friends or post it on your Timeline."]')?.click();
+                elem.querySelector('[aria-label="Send this to friends or post it on your Timeline."]')?.click();
 
-                    const shareOptionContainer = elem.querySelector("[role=dialog]");
-                    const shareOptions = shareOptionContainer.querySelectorAll("[role=button]");
-                    const copyLink = shareOptions[shareOptions.length - 1];
+                const shareOptionContainer = elem.querySelector("[role=dialog]");
+                const shareOptions = shareOptionContainer.querySelectorAll("[role=button]");
+                const copyLink = shareOptions[shareOptions.length - 1];
 
-                    copyLink.addEventListener("click", () => {
-                        navigator.clipboard.readText().then((clipboardText) => {
-                            res(clipboardText);
-                        });
-                    });
+                copyLink.click();
 
-                    copyLink.click();
-                });
+                const url = await navigator.clipboard.readText();
 
                 // Get the text
-                const more = elem.querySelector("[role=button]");
-
                 if (msg && url) {
+                    const more = msg.querySelector("[role=button]");
+
                     if (more) {
                         more.click();
                         await new Promise((res) => setTimeout(res, 100));
