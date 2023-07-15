@@ -1,4 +1,6 @@
 const chromium = require("chrome-aws-lambda");
+const AWS = require("aws-sdk");
+const secretsManager = new AWS.SecretsManager({ region: "ap-southeast-2" });
 
 exports.handler = async (event, context, callback) => {
     // Load env
@@ -6,12 +8,6 @@ exports.handler = async (event, context, callback) => {
         require("dotenv").config({ path: "../../.env" });
     }
 
-    const AWS = require("aws-sdk");
-    const secretsManager = new AWS.SecretsManager({ region: "ap-southeast-2" });
-    const puppeteer = require("puppeteer-core");
-    const fs = require("fs");
-
-    // Load env
     const secretsArn = process.env.SECRETS_ARN;
 
     const secretsString = (await secretsManager.getSecretValue({ SecretId: secretsArn }).promise()).SecretString;
