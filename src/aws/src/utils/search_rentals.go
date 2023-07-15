@@ -5,18 +5,18 @@ import (
 )
 
 type SearchParams struct {
-	Page       uint
-	Latitude   *float64
-	Longitude  *float64
-	Radius     *uint // metres
-	Price      *int
-	Bond       *int
-	RentalType *string
-	Gender     *string
-	Age        *string
-	Duration   *string
-	Tenant     *string
-	Features   *[]string
+	Page       uint      `json:"page"`
+	Latitude   *float64  `json:"latitude"`
+	Longitude  *float64  `json:"longitude"`
+	Radius     *uint     `json:"radius"` // metres
+	Price      *int      `json:"price"`
+	Bond       *int      `json:"bond"`
+	RentalType *string   `json:"rentalType"`
+	Gender     *string   `json:"gender"`
+	Age        *string   `json:"age"`
+	Duration   *string   `json:"duration"`
+	Tenant     *string   `json:"tenant"`
+	Features   *[]string `json:"features"`
 }
 
 type RentalResult struct {

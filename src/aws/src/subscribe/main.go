@@ -6,9 +6,13 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/dynamodb"
+	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 	"github.com/bengosborn/roomiez/aws/utils"
 )
 
@@ -23,6 +27,22 @@ func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 
 	table := os.Getenv("TABLE")
 
+	env, err := utils.LoadEnv(ctx)
+	if err != nil {
+		logger.Println(err)
+
+		return nil, err
+	}
+
+	sess, err := session.NewSession()
+	if err != nil {
+		logger.Println(err)
+
+		return nil, err
+	}
+
+	svc := dynamodb.New(sess)
+
 	// Extract email
 	body := &Body{}
 	if err := json.Unmarshal([]byte(request.Body), body); err != nil {
@@ -32,10 +52,31 @@ func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 	}
 
 	// Store data in dynamodb
+	key, err := utils.GenerateKey(body.Email, env.SecretKey)
+	if err != nil {
+		logger.Println(err)
 
-	// **** We need to hash the key for the unsubscribe option (needs a GSI), insert the params as json, and insert the email
+		return nil, err
+	}
 
-	logger.Println(table)
+	record := &utils.SubscriptionRecord{
+		ID:           key,
+		SearchParams: &body.SearchParams,
+		Timestamp:    time.Now(),
+	}
+
+	av, err := dynamodbattribute.MarshalMap(record)
+	if err != nil {
+		logger.Println(err)
+
+		return nil, err
+	}
+
+	if _, err := svc.PutItem(&dynamodb.PutItemInput{Item: av, TableName: &table}); err != nil {
+		logger.Println(err)
+
+		return nil, err
+	}
 
 	logger.Println("OK")
 

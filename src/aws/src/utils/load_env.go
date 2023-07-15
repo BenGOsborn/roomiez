@@ -17,6 +17,7 @@ type Env struct {
 	AWSLocationPlaceIndex string `json:"AWS_LOCATION_PLACE_INDEX"`
 	SendGridAPIKey        string `json:"SENDGRID_API_KEY"`
 	SendGridTemplateId    string `json:"SENDGRID_TEMPLATE_ID"`
+	SecretKey             string `json:"SECRET_KEY"`
 }
 
 // Load environment variables from secrets

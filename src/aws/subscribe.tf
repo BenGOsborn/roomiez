@@ -3,10 +3,10 @@
 resource "aws_dynamodb_table" "subscriptions" {
   name         = "subscriptions"
   billing_mode = "PAY_PER_REQUEST"
-  hash_key     = "email"
+  hash_key     = "id"
 
   attribute {
-    name = "email"
+    name = "id"
     type = "S"
   }
 
