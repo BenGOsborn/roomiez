@@ -76,7 +76,7 @@ resource "aws_lambda_function" "subscribe_lambda" {
 }
 
 resource "aws_lambda_function" "unsubscribe_lambda" {
-  function_name    = "subscribe"
+  function_name    = "unsubscribe"
   role             = aws_iam_role.unsubscribe_lambda_role.arn
   handler          = "main"
   runtime          = "go1.x"
@@ -160,7 +160,7 @@ resource "aws_iam_role_policy_attachment" "subscribe_lambda_dynamo" {
 }
 
 resource "aws_iam_role" "unsubscribe_lambda_role" {
-  name = "subscribe-lambda-role"
+  name = "unsubscribe-lambda-role"
 
   assume_role_policy = <<EOF
 {
