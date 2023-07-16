@@ -16,3 +16,10 @@ vite.config.ts.timestamp-*
 
 # Scraper
 *.exe
+
+# Plasmo
+out/
+build/
+dist/
+
+.plasmo
