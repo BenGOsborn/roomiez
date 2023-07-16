@@ -25,6 +25,8 @@ func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 	// Load requirements
 	logger := log.New(os.Stdout, "[Subscribe] ", log.Ldate|log.Ltime)
 
+	// **** We need a different way of getting this field and parsing it into our search params - we need to form a custom struct
+
 	env, err := utils.LoadEnv(ctx)
 	if err != nil {
 		logger.Println(err)

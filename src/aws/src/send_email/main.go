@@ -27,6 +27,8 @@ func HandleRequest(ctx context.Context, sqsEvent events.SQSEvent) error {
 		return err
 	}
 
+	unsubscribeUrl := os.Getenv("UNSUBSCRIBE_URL")
+
 	client := sendgrid.NewSendClient(env.SendGridAPIKey)
 
 	db, err := gorm.Open(mysql.Open(env.DSN))
@@ -72,6 +74,8 @@ func HandleRequest(ctx context.Context, sqsEvent events.SQSEvent) error {
 			email.Personalizations[0].SetSubstitution(body, (*rentals)[i].Description)
 			email.Personalizations[0].SetSubstitution(url, (*rentals)[i].URL)
 		}
+
+		email.Personalizations[0].SetSubstitution("unsubscribe", fmt.Sprint(unsubscribeUrl, "?id=", record.ID))
 
 		if _, err := client.Send(email); err != nil {
 			logger.Println(err)

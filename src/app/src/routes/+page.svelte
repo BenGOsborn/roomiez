@@ -1,16 +1,16 @@
 <script lang="ts">
 	import { PUBLIC_API_ENDPOINT } from "$env/static/public";
-	import { getRentals, type SearchFields } from "$lib/api";
+	import { getRentals, subscribeEmail, type SearchParams } from "$lib/api";
 	import { derived, type Stores } from "svelte/store";
 	import Pagination from "../components/Pagination.svelte";
 	import Query from "../components/Query/index.svelte";
 	import Rental from "../components/Rental.svelte";
-	import { page, age, duration, features, gender, location, radius, rentalType, tenant, price, bond } from "../stores";
+	import { page, age, duration, features, gender, location, radius, rentalType, tenant, price, bond, email } from "../stores";
 	import Map from "../components/Map.svelte";
 
 	let timeoutId: number | null = null;
 
-	const searchFields = derived<Stores, SearchFields | undefined>(
+	const searchParams = derived<Stores, SearchParams | undefined>(
 		[page, age, duration, features, gender, location, radius, rentalType, tenant, price, bond],
 		([$page, $age, $duration, $features, $gender, $location, $radius, $rentalType, $tenant, $price, $bond], set) => {
 			if (timeoutId) clearTimeout(timeoutId);
@@ -32,7 +32,7 @@
 					return prev;
 				}, [] as string[]);
 
-				const searchFields: SearchFields = {
+				const searchParams: SearchParams = {
 					page: $page,
 					age: _age,
 					bond: _bond,
@@ -45,10 +45,23 @@
 					tenant: _tenant
 				};
 
-				set(searchFields);
+				set(searchParams);
 			}, 500);
 		}
 	);
+
+	const emailSubscription = derived<Stores, { params: SearchParams; email: string } | undefined>([email, searchParams], ([$email, $searchParams]) => {
+		if (!$searchParams || !$email) return;
+
+		return {
+			params: $searchParams,
+			email: $email
+		};
+	});
+
+	emailSubscription.subscribe(async (value) => {
+		if (!!value) await subscribeEmail(PUBLIC_API_ENDPOINT, value.email, value.params);
+	});
 </script>
 
 <div class="mx-auto w-4/5 mt-8">
@@ -57,8 +70,8 @@
 			<Query />
 		</div>
 		<div class="md:w-3/4">
-			{#if $searchFields}
-				{#await getRentals(PUBLIC_API_ENDPOINT, $searchFields)}
+			{#if $searchParams}
+				{#await getRentals(PUBLIC_API_ENDPOINT, $searchParams)}
 					<p class="text-center font-medium text-gray-800">Loading rentals...</p>
 				{:then rentals}
 					<div class="flex flex-col space-y-8">

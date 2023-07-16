@@ -73,3 +73,14 @@ export async function getRentals(apiBase: string, searchParams: SearchParams): P
 
 	return z.array(searchResultSchema).parse(data);
 }
+
+// Subscribe a user
+export async function subscribeEmail(apiBase: string, email: string, searchParams: SearchParams): Promise<void> {
+	const data = {
+		email,
+		searchParams
+	};
+
+	// Make request
+	await axios.put(`${apiBase}/subscribe`, data);
+}

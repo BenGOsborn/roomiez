@@ -48,8 +48,9 @@ resource "aws_lambda_function" "send_email_lambda" {
 
   environment {
     variables = {
-      ENV         = "production"
-      SECRETS_ARN = aws_secretsmanager_secret.secrets.arn
+      ENV             = "production"
+      SECRETS_ARN     = aws_secretsmanager_secret.secrets.arn
+      UNSUBSCRIBE_URL = "${aws_api_gateway_deployment.deployment.invoke_url}${aws_api_gateway_resource.subscribe_resource.path}"
     }
   }
 }
