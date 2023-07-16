@@ -11,6 +11,7 @@ type SubscriptionRecord struct {
 	ID           string        `json:"id"`
 	SearchParams *SearchParams `json:"searchParams"`
 	Timestamp    time.Time     `json:"timestamp"`
+	Email        string        `json:"email"`
 }
 
 // Generate key for subscription records

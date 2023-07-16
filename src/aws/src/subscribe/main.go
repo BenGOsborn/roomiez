@@ -63,6 +63,7 @@ func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 		ID:           key,
 		SearchParams: &body.SearchParams,
 		Timestamp:    time.Now(),
+		Email:        body.Email,
 	}
 
 	av, err := dynamodbattribute.MarshalMap(record)

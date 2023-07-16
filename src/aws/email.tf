@@ -37,6 +37,30 @@ resource "aws_lambda_function" "schedule_email_lambda" {
   }
 }
 
+resource "aws_lambda_function" "send_email_lambda" {
+  function_name    = "send-email"
+  role             = aws_iam_role.send_email_lambda_role.arn
+  handler          = "main"
+  runtime          = "go1.x"
+  timeout          = 120
+  filename         = "send_email.zip"
+  source_code_hash = filebase64sha256("send_email.zip")
+
+  environment {
+    variables = {
+      ENV         = "production"
+      SECRETS_ARN = aws_secretsmanager_secret.secrets.arn
+    }
+  }
+}
+
+# Permissions
+
+resource "aws_lambda_event_source_mapping" "send_email_sqs_mapping" {
+  event_source_arn = aws_sqs_queue.email_queue.arn
+  function_name    = aws_lambda_function.send_email_lambda.function_name
+}
+
 # Roles
 
 resource "aws_iam_role" "schedule_email_lambda_role" {
@@ -71,4 +95,38 @@ resource "aws_iam_role_policy_attachment" "schedule_email_lambda_dynamo" {
 resource "aws_iam_role_policy_attachment" "schedule_email_lambda_sqs" {
   role       = aws_iam_role.schedule_email_lambda_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSQSFullAccess"
+}
+
+resource "aws_iam_role" "send_email_lambda_role" {
+  name = "send-email-lambda-role"
+
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "lambda.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "send_email_lambda_basic" {
+  role       = aws_iam_role.send_email_lambda_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+resource "aws_iam_role_policy_attachment" "send_email_lambda_sqs" {
+  role       = aws_iam_role.send_email_lambda_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSQSFullAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "send_email_lambda_secrets_manager_policy" {
+  role       = aws_iam_role.send_email_lambda_role.name
+  policy_arn = aws_iam_policy.secrets_manager_policy.arn
 }
