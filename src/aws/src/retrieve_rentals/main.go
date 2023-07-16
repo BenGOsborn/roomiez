@@ -15,10 +15,6 @@ import (
 	"gorm.io/gorm"
 )
 
-const (
-	PageSize = 25
-)
-
 func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
 	// Load requirements
 	logger := log.New(os.Stdout, "[RetrieveRentals] ", log.Ldate|log.Ltime)
@@ -45,7 +41,7 @@ func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 		return nil, err
 	}
 
-	rentals, err := utils.SearchRentals(db, searchParams, PageSize)
+	rentals, err := utils.SearchRentals(db, searchParams)
 	if err != nil {
 		logger.Println(err)
 

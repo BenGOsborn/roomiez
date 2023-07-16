@@ -4,6 +4,10 @@ import (
 	"gorm.io/gorm"
 )
 
+const (
+	PerPage = 10
+)
+
 type SearchParams struct {
 	Page       uint      `json:"page"`
 	Latitude   *float64  `json:"latitude"`
@@ -45,7 +49,7 @@ type SearchResult struct {
 }
 
 // Find a list of rentals that match the search params
-func SearchRentals(db *gorm.DB, searchParams *SearchParams, perPage uint) (*[]SearchResult, error) {
+func SearchRentals(db *gorm.DB, searchParams *SearchParams) (*[]SearchResult, error) {
 	// Retrieve all matching rentals
 	query := db.Table("rentals")
 
@@ -101,7 +105,7 @@ func SearchRentals(db *gorm.DB, searchParams *SearchParams, perPage uint) (*[]Se
 		query = query.Where("ST_Distance_Sphere(ST_GeomFromText(coordinates), POINT(?, ?)) <= ?", searchParams.Longitude, searchParams.Latitude, searchParams.Radius)
 	}
 
-	query = query.Offset((int(searchParams.Page) - 1) * int(perPage)).Limit(int(perPage)).Order("rentals.created_at DESC")
+	query = query.Offset((int(searchParams.Page) - 1) * int(PerPage)).Limit(int(PerPage)).Order("rentals.created_at DESC")
 
 	rentalResults := &[]RentalResult{}
 	if err := query.Find(rentalResults).Error; err != nil {

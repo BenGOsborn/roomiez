@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"os"
 
@@ -11,6 +12,8 @@ import (
 	"github.com/bengosborn/roomiez/aws/utils"
 	"github.com/sendgrid/sendgrid-go"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 )
 
 func HandleRequest(ctx context.Context, sqsEvent events.SQSEvent) error {
@@ -25,6 +28,13 @@ func HandleRequest(ctx context.Context, sqsEvent events.SQSEvent) error {
 	}
 
 	client := sendgrid.NewSendClient(env.SendGridAPIKey)
+
+	db, err := gorm.Open(mysql.Open(env.DSN))
+	if err != nil {
+		logger.Println(err)
+
+		return err
+	}
 
 	for _, message := range sqsEvent.Records {
 		record := &utils.SubscriptionRecord{}
@@ -42,18 +52,32 @@ func HandleRequest(ctx context.Context, sqsEvent events.SQSEvent) error {
 		email := mail.NewV3MailInit(from, subject, to)
 		email.SetTemplateID(env.SendGridTemplateId)
 
-		// **** We need to search first and make sure we have sufficient users
+		rentals, err := utils.SearchRentals(db, record.SearchParams)
+		if err != nil {
+			logger.Println(err)
 
-		// substitutions := map[string]string{
-		// 	"placeholder1": "value1",
-		// 	"placeholder2": "value2",
-		// }
+			continue
+		} else if len(*rentals) < 4 {
+			logger.Println("not enough rentals found")
+
+			continue
+		}
+
+		for i := 0; i < 4; i++ {
+			body := fmt.Sprint("property_", i+1)
+			url := fmt.Sprint("url_", i+1)
+
+			email.Personalizations[0].SetSubstitution(body, (*rentals)[i].Description)
+			email.Personalizations[0].SetSubstitution(url, (*rentals)[i].URL)
+		}
 
 		if _, err := client.Send(email); err != nil {
 			logger.Println(err)
 
 			continue
 		}
+
+		logger.Println("sent email to", record.ID)
 	}
 
 	return nil
