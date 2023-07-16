@@ -136,6 +136,11 @@ resource "aws_iam_role_policy_attachment" "subscribe_lambda_dynamo" {
   policy_arn = aws_iam_policy.subscriptions_dynamo_policy.arn
 }
 
+resource "aws_iam_role_policy_attachment" "subscribe_lambda_location" {
+  role       = aws_iam_role.subscribe_lambda_role.name
+  policy_arn = aws_iam_policy.location_policy.arn
+}
+
 resource "aws_iam_role" "unsubscribe_lambda_role" {
   name = "unsubscribe-lambda-role"
 

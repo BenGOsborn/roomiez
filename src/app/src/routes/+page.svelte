@@ -22,7 +22,8 @@
 				const _rentalType = !!$rentalType ? $rentalType : null;
 				const _tenant = !!$tenant ? $tenant : null;
 
-				const _location = !!$location ? { location: $location, radius: $radius * 1000 } : null;
+				const _location = !!$location ? $location : null;
+				const _radius = !!$radius ? $radius * 1000 : null;
 
 				const _price = $price <= 1500 ? $price : null;
 				const _bond = $bond <= 3000 ? $bond : null;
@@ -40,6 +41,7 @@
 					features: _features,
 					gender: _gender,
 					location: _location,
+					radius: _radius,
 					price: _price,
 					rentalType: _rentalType,
 					tenant: _tenant

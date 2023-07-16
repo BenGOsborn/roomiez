@@ -16,16 +16,28 @@ import (
 	"github.com/bengosborn/roomiez/aws/utils"
 )
 
+type Params struct {
+	Page       uint      `json:"page"`
+	Location   *string   `json:"location"`
+	Radius     *uint     `json:"radius"`
+	Price      *int      `json:"price"`
+	Bond       *int      `json:"bond"`
+	RentalType *string   `json:"rentalType"`
+	Gender     *string   `json:"gender"`
+	Age        *string   `json:"age"`
+	Duration   *string   `json:"duration"`
+	Tenant     *string   `json:"tenant"`
+	Features   *[]string `json:"features"`
+}
+
 type Body struct {
-	Email        string             `json:"email"`
-	SearchParams utils.SearchParams `json:"searchParams"`
+	Email  string `json:"email"`
+	Params Params `json:"params"`
 }
 
 func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
 	// Load requirements
 	logger := log.New(os.Stdout, "[Subscribe] ", log.Ldate|log.Ltime)
-
-	// **** We need a different way of getting this field and parsing it into our search params - we need to form a custom struct
 
 	env, err := utils.LoadEnv(ctx)
 	if err != nil {
@@ -45,12 +57,34 @@ func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 
 	ddb := dynamodb.New(sess)
 
-	// Extract email
+	// Extract features
 	body := &Body{}
 	if err := json.Unmarshal([]byte(request.Body), body); err != nil {
 		logger.Println(err)
 
 		return nil, err
+	}
+
+	latitude, longitude, err := utils.CoordsFromAddress(ctx, *body.Params.Location, env.AWSLocationPlaceIndex)
+	if err != nil {
+		logger.Println(err)
+
+		return nil, err
+	}
+
+	searchParams := &utils.SearchParams{
+		Page:       body.Params.Page,
+		Latitude:   &latitude,
+		Longitude:  &longitude,
+		Radius:     body.Params.Radius,
+		Price:      body.Params.Price,
+		Bond:       body.Params.Bond,
+		RentalType: body.Params.RentalType,
+		Gender:     body.Params.Gender,
+		Age:        body.Params.Age,
+		Duration:   body.Params.Duration,
+		Tenant:     body.Params.Tenant,
+		Features:   body.Params.Features,
 	}
 
 	// Store data in dynamodb
@@ -63,7 +97,7 @@ func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 
 	record := &utils.SubscriptionRecord{
 		ID:           key,
-		SearchParams: &body.SearchParams,
+		SearchParams: searchParams,
 		Timestamp:    time.Now(),
 		Email:        body.Email,
 	}

@@ -21,10 +21,8 @@ export async function getFields(apiBase: string): Promise<Fields> {
 
 export interface SearchParams {
 	page: number;
-	location: {
-		location: string;
-		radius: number;
-	} | null;
+	location: string | null;
+	radius: number | null;
 	price: number | null;
 	bond: number | null;
 	rentalType: string | null;
@@ -58,7 +56,7 @@ export async function getRentals(apiBase: string, searchParams: SearchParams): P
 	// Convert the fields to a query string
 	let queryParams = `?page=${searchParams.page}`;
 
-	if (searchParams.location) queryParams += `&location=${searchParams.location.location}&radius=${searchParams.location.radius}`;
+	if (searchParams.location) queryParams += `&location=${searchParams.location}&radius=${searchParams.radius}`;
 	if (searchParams.price) queryParams += `&price=${searchParams.price}`;
 	if (searchParams.bond) queryParams += `&bond=${searchParams.bond}`;
 	if (searchParams.rentalType) queryParams += `&rentalType=${searchParams.rentalType}`;
@@ -75,10 +73,10 @@ export async function getRentals(apiBase: string, searchParams: SearchParams): P
 }
 
 // Subscribe a user
-export async function subscribeEmail(apiBase: string, email: string, searchParams: SearchParams): Promise<void> {
+export async function subscribeEmail(apiBase: string, email: string, params: SearchParams): Promise<void> {
 	const data = {
 		email,
-		searchParams
+		params
 	};
 
 	// Make request
