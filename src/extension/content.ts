@@ -1,31 +1,22 @@
+import type { PlasmoCSConfig } from "plasmo"
+
 export {}
 
-console.log("Registered content script")
-
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-  console.log(request)
+  const seen = new Set<string>(request.seen)
+  const key = request.key
 
-  run()
+  run(seen, key).then(() => {
+    sendResponse({ seen: Array.from(seen) })
+  })
+
+  return true
 })
 
-async function run() {
-  window.scrollTo(0, document.body.scrollHeight)
-
+async function run(seen: Set<string>, key: string) {
   await new Promise((res) => setTimeout(res, 3000))
 
-  const out = []
-
   for (const elem of Array.from(document.querySelector("[role=feed]").children)) {
-    out.push(elem)
-  }
-
-  // **** We need some type of recursion where we have an event listener
-
-  async function recurse(index: number) {
-    if (index === out.length) return
-
-    const elem = out[index]
-
     // Expand the text
     const msg = elem.querySelector("[data-ad-comet-preview=message]")
 
@@ -37,8 +28,6 @@ async function run() {
         more.click()
         await new Promise((res) => setTimeout(res, 100))
       }
-
-      console.log(msg.textContent)
     }
 
     // Get the post URL
@@ -57,23 +46,25 @@ async function run() {
 
           copyLink.scrollIntoView()
 
-          const url = await new Promise((res) => {
+          const url = await new Promise<string>((res) => {
             copyLink.addEventListener("click", () => {
               navigator.clipboard.readText().then((url) => res(url))
             })
           })
 
-          console.log(url)
+          if (seen.has(url)) break
+          seen.add(url)
+
+          //   Post request
+          console.log({ url, post: msg.textContent })
+
           //   **** So now here we can take the values and submit them
-          //   **** We need to store this in local storage to make sure no duplicates
-          // **** We need some button where upon clicking it will send down
-          // **** Also need a variable about the depth AND setting the API key
         }
       }
     }
-
-    recurse(index + 1)
   }
+}
 
-  await recurse(0)
+export const config: PlasmoCSConfig = {
+  matches: ["http://www.facebook.com/*"]
 }
