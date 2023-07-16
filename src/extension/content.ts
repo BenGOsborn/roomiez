@@ -1,8 +1,12 @@
 export {}
 
-console.log("Loaded content script")
+console.log("Registered content script")
 
-// **** So we need to add all elements to the array, move the element
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+  console.log(request)
+
+  run()
+})
 
 async function run() {
   window.scrollTo(0, document.body.scrollHeight)
@@ -73,25 +77,3 @@ async function run() {
 
   await recurse(0)
 }
-
-//     // @ts-ignore
-//     // copyLink.click()
-//     // await new Promise((res) => setTimeout(res, 1000))
-
-//     // const url = await navigator.clipboard.readText()
-
-//     // Get the text
-//     if (msg && url) {
-//       const more = msg.querySelector("[role=button]")
-
-//       if (more) {
-//         // @ts-ignore
-//         more.click()
-//         await new Promise((res) => setTimeout(res, 100))
-//       }
-
-//       console.log(msg.textContent)
-//     }
-// }
-
-run()
