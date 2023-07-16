@@ -1,20 +1,3 @@
-# Database
-
-resource "aws_dynamodb_table" "subscriptions" {
-  name         = "subscriptions"
-  billing_mode = "PAY_PER_REQUEST"
-  hash_key     = "id"
-
-  attribute {
-    name = "id"
-    type = "S"
-  }
-
-  point_in_time_recovery {
-    enabled = true
-  }
-}
-
 # API
 
 resource "aws_api_gateway_resource" "subscribe_resource" {
@@ -62,7 +45,7 @@ resource "aws_lambda_function" "subscribe_lambda" {
   role             = aws_iam_role.subscribe_lambda_role.arn
   handler          = "main"
   runtime          = "go1.x"
-  timeout          = "30"
+  timeout          = 30
   filename         = "subscribe.zip"
   source_code_hash = filebase64sha256("subscribe.zip")
 
@@ -80,7 +63,7 @@ resource "aws_lambda_function" "unsubscribe_lambda" {
   role             = aws_iam_role.unsubscribe_lambda_role.arn
   handler          = "main"
   runtime          = "go1.x"
-  timeout          = "30"
+  timeout          = 30
   filename         = "unsubscribe.zip"
   source_code_hash = filebase64sha256("unsubscribe.zip")
 
@@ -108,19 +91,6 @@ resource "aws_lambda_permission" "apigw_unsubscribe_lambda_permission" {
   function_name = aws_lambda_function.unsubscribe_lambda.function_name
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_api_gateway_rest_api.rest_api.execution_arn}/*/${aws_api_gateway_method.subscribe_delete_method.http_method}${aws_api_gateway_resource.subscribe_resource.path}"
-}
-
-data "aws_iam_policy_document" "subscriptions_dynamo_policy" {
-  statement {
-    effect    = "Allow"
-    actions   = ["dynamodb:*"]
-    resources = [aws_dynamodb_table.subscriptions.arn]
-  }
-}
-
-resource "aws_iam_policy" "subscriptions_dynamo_policy" {
-  name   = "subscriptions-dynamo-policy"
-  policy = data.aws_iam_policy_document.subscriptions_dynamo_policy.json
 }
 
 # Roles

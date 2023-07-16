@@ -29,7 +29,7 @@ resource "aws_lambda_function" "get_fields_lambda" {
   role             = aws_iam_role.get_fields_lambda_role.arn
   handler          = "main"
   runtime          = "go1.x"
-  timeout          = "30"
+  timeout          = 30
   filename         = "get_fields.zip"
   source_code_hash = filebase64sha256("get_fields.zip")
 

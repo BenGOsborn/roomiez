@@ -56,6 +56,23 @@ resource "aws_api_gateway_usage_plan_key" "usage_plan_key" {
   usage_plan_id = aws_api_gateway_usage_plan.usage_plan.id
 }
 
+# Database
+
+resource "aws_dynamodb_table" "subscriptions" {
+  name         = "subscriptions"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "id"
+
+  attribute {
+    name = "id"
+    type = "S"
+  }
+
+  point_in_time_recovery {
+    enabled = true
+  }
+}
+
 # Policies
 
 data "aws_iam_policy_document" "secrets_manager_policy" {
@@ -82,4 +99,17 @@ data "aws_iam_policy_document" "location_policy" {
 resource "aws_iam_policy" "location_policy" {
   name   = "location-policy"
   policy = data.aws_iam_policy_document.location_policy.json
+}
+
+data "aws_iam_policy_document" "subscriptions_dynamo_policy" {
+  statement {
+    effect    = "Allow"
+    actions   = ["dynamodb:*"]
+    resources = [aws_dynamodb_table.subscriptions.arn]
+  }
+}
+
+resource "aws_iam_policy" "subscriptions_dynamo_policy" {
+  name   = "subscriptions-dynamo-policy"
+  policy = data.aws_iam_policy_document.subscriptions_dynamo_policy.json
 }

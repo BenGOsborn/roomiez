@@ -11,11 +11,18 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
+	"github.com/bengosborn/roomiez/aws/utils"
 )
 
 func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
 	// Load requirements
 	logger := log.New(os.Stdout, "[Unsubscribe] ", log.Ldate|log.Ltime)
+
+	if _, err := utils.LoadEnv(ctx); err != nil {
+		logger.Println(err)
+
+		return nil, err
+	}
 
 	table := os.Getenv("TABLE")
 
@@ -26,7 +33,7 @@ func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 		return nil, err
 	}
 
-	svc := dynamodb.New(sess)
+	ddb := dynamodb.New(sess)
 
 	// Extract email
 	id, ok := request.QueryStringParameters["id"]
@@ -38,7 +45,7 @@ func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 	}
 
 	// Delete record from dynamodb
-	if _, err := svc.DeleteItem(&dynamodb.DeleteItemInput{Key: map[string]*dynamodb.AttributeValue{"ID": {S: &id}}, TableName: &table}); err != nil {
+	if _, err := ddb.DeleteItem(&dynamodb.DeleteItemInput{Key: map[string]*dynamodb.AttributeValue{"ID": {S: &id}}, TableName: &table}); err != nil {
 		logger.Println(err)
 
 		return nil, err

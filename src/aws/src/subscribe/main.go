@@ -25,14 +25,14 @@ func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 	// Load requirements
 	logger := log.New(os.Stdout, "[Subscribe] ", log.Ldate|log.Ltime)
 
-	table := os.Getenv("TABLE")
-
 	env, err := utils.LoadEnv(ctx)
 	if err != nil {
 		logger.Println(err)
 
 		return nil, err
 	}
+
+	table := os.Getenv("TABLE")
 
 	sess, err := session.NewSession()
 	if err != nil {
@@ -41,7 +41,7 @@ func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 		return nil, err
 	}
 
-	svc := dynamodb.New(sess)
+	ddb := dynamodb.New(sess)
 
 	// Extract email
 	body := &Body{}
@@ -72,7 +72,7 @@ func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 		return nil, err
 	}
 
-	if _, err := svc.PutItem(&dynamodb.PutItemInput{Item: av, TableName: &table}); err != nil {
+	if _, err := ddb.PutItem(&dynamodb.PutItemInput{Item: av, TableName: &table}); err != nil {
 		logger.Println(err)
 
 		return nil, err
