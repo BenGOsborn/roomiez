@@ -36,6 +36,8 @@ func HandleRequest(ctx context.Context, sqsEvent events.SQSEvent) error {
 		return err
 	}
 
+	// TODO add DLQ
+
 	for _, message := range sqsEvent.Records {
 		record := &utils.SubscriptionRecord{}
 
