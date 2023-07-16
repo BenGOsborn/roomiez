@@ -41,14 +41,15 @@ func HandleRequest(ctx context.Context, request events.CloudWatchEvent) (*events
 
 	if err := ddb.ScanPages(&dynamodb.ScanInput{TableName: &table}, func(page *dynamodb.ScanOutput, lastPage bool) bool {
 		for _, item := range page.Items {
-			itemMap, err := dynamodbattribute.MarshalMap(item)
-			if err != nil {
+			record := &utils.SubscriptionRecord{}
+
+			if err := dynamodbattribute.UnmarshalMap(item, record); err != nil {
 				logger.Println(err)
 
 				continue
 			}
 
-			data, err := json.Marshal(itemMap)
+			data, err := json.Marshal(record)
 			if err != nil {
 				logger.Println(err)
 

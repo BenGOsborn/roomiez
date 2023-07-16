@@ -18,11 +18,7 @@ func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 	// Load requirements
 	logger := log.New(os.Stdout, "[Unsubscribe] ", log.Ldate|log.Ltime)
 
-	if _, err := utils.LoadEnv(ctx); err != nil {
-		logger.Println(err)
-
-		return nil, err
-	}
+	utils.LoadEnv(ctx)
 
 	table := os.Getenv("TABLE")
 
@@ -45,7 +41,7 @@ func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 	}
 
 	// Delete record from dynamodb
-	if _, err := ddb.DeleteItem(&dynamodb.DeleteItemInput{Key: map[string]*dynamodb.AttributeValue{"ID": {S: &id}}, TableName: &table}); err != nil {
+	if _, err := ddb.DeleteItem(&dynamodb.DeleteItemInput{Key: map[string]*dynamodb.AttributeValue{"id": {S: &id}}, TableName: &table}); err != nil {
 		logger.Println(err)
 
 		return nil, err
