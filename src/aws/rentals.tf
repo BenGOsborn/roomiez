@@ -43,7 +43,7 @@ resource "aws_api_gateway_integration" "rentals_post_lambda_integration" {
   http_method             = aws_api_gateway_method.rentals_post_method.http_method
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
-  uri                     = aws_lambda_function.process_rental_lambda.invoke_arn
+  uri                     = aws_lambda_function.process_rental_enqueue_lambda.invoke_arn
 }
 
 # Queue
