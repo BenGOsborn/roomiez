@@ -54,15 +54,15 @@ func NewPostExtraction(llm *openai.Chat) *chains.LLMChain {
 
 	JSON Schema:
 	type RentalSchema = {
-		price?: number | null;
-		bond?: number | null;
-		location?: string | null;
-		rentalType?: "Apartment" | "House" | null;
-		gender?: "Male" | "Female" | null;
-		age?: "Young" | "Middle Aged" | "Old" | null;
-		duration?: "Short Term" | "Long Term" | null;
-		tenant?: "Singles" | "Couples" | null;
-		features?: ("Garage" | "WiFi" | "Bills Included" | "Furnished" | "Pets Allowed" | "Garage" | "Mattress" | "Pool" | "Gym")[];
+		price: number | null;
+		bond: number | null;
+		location: string | null;
+		rentalType: "Apartment" | "House" | null;
+		gender: "Male" | "Female" | null;
+		age: "Young" | "Middle Aged" | "Old" | null;
+		duration: "Short Term" | "Long Term" | null;
+		tenant: "Singles" | "Couples" | null;
+		features: ("Garage" | "WiFi" | "Bills Included" | "Furnished" | "Pets Allowed" | "Garage" | "Mattress" | "Pool" | "Gym")[];
 	}
 
 	Some examples have been provided below to give you context.
