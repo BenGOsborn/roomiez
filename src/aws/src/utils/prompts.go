@@ -21,12 +21,6 @@ func NewPostValidation(llm *openai.Chat) *chains.LLMChain {
 	• House is only 1km walk to Canterbury train station which takes you to the central in 20 minutes by train
 	• Less than 30 minutes from city centre, beautiful beaches, universities, and airport.
 	• Plenty of street parking available for free if you have a car.
-	• Has a big but low maintenance cemented backyard with privacy on quiet street.
-	• Ground floor so you don't have to climb stairs.
-	• Well lit, airy and sunny home.
-	• Big lounge and spacious kitchen with more than enough shelves to store your pantry items.
-	• High ceilings with big wardrobe
-	• Double brick home with good insulation.
 	• Share bathroom, lounge and kitchen with a mum and daughter only
 	• Might suit Females / students / retirees / backpackers / 40+
 	Output:
@@ -34,7 +28,7 @@ func NewPostValidation(llm *openai.Chat) *chains.LLMChain {
 
 	Post:
 	I'm Jane Doe, 28 from the US. Looking for a place in the areas of Bondi/Bondi Junction/Coogee/Bronte/Woollahra and surrounding. 
-	Very easy going, love the beach and into my fitness. Love to cook and have a drink over dinner. Enjoy down time and own space but always happy to socialise and respectful of living space.
+	Very easy going, love the beach and into my fitness. Love to cook and have a drink over dinner.
 	Preferably a furnished place but willing to furnish the bedroom and have a weekly budget of $400incl bills - willing to pay more depending on property etc.
 	Available to move in from 19th July🙂
 	Output:
@@ -107,49 +101,6 @@ func NewPostExtraction(llm *openai.Chat) *chains.LLMChain {
 	}
 
 	Post:
-	📍Sydney Olympic Park
-	🎡🎡🎡MASTER ROOM AVAILABLE 🎡🎡🎡
-	Negotiable for single
-	👌all bills included 
-	🛜Internet✅
-	🛁Own bathroom✅
-	2 Wardrobe✅ 
-	Comfortable new Bed✅
-	study desk
-	🛒 Close to IGA
-	🚏Bus stop 2 min
-	🚊Train station 6 min
-	🔑Security
-	📍Minimum stay 3-6 months
-	👍2weeks bond 
-	👍🏻2 weeks rent in advance 
-	🌲🌲🌲  Beautiful park to walk and do barbecue no need to go far away to have a picnic
-	🎓study room, 
-	😀 very clean, nice and calm environment 
-	🏡 private balcony 
-	🚭No smoke 
-	🍾No party
-	🐶No pet
-	📍the room has a great view, quiet, comfy and privacy.
-	Please kindly send me chat 480$ per week included bills.💕
-	Output:
-	{
-		"price": 480,
-		"bond": null,
-		"location": "Sydney Olympic Park",
-		"rentalType": "Apartment",
-		"gender": null,
-		"age": null,
-		"duration": "Long Term",
-		"tenant": "Singles",
-		"features": [
-			"Bills Included",
-			"WiFi",
-			"Mattress"
-		]
-	}	
-
-	Post:
 	{{.post}}
 	Output:
 	`, []string{"post"})
@@ -185,37 +136,6 @@ func NewPostDescription(llm *openai.Chat) *chains.LLMChain {
 	Summary:
 	Short term room for rent in Maroubra. Price is $300/week and bond is $1080. Looking for a girl to live with two working girls in their early 30s.
 	Bus to city outside, 10 min walk to Maroubra Beach. 5 min walk to Maroubra Junction. Free street parking.
-
-	Post:
-	📍Sydney Olympic Park
-	🎡🎡🎡MASTER ROOM AVAILABLE 🎡🎡🎡
-	Negotiable for single
-	👌all bills included 
-	🛜Internet✅
-	🛁Own bathroom✅
-	2 Wardrobe✅ 
-	Comfortable new Bed✅
-	study desk
-	🛒 Close to IGA
-	🚏Bus stop 2 min
-	🚊Train station 6 min
-	🔑Security
-	📍Minimum stay 3-6 months
-	👍2weeks bond 
-	👍🏻2 weeks rent in advance 
-	🌲🌲🌲  Beautiful park to walk and do barbecue no need to go far away to have a picnic
-	🎓study room, 
-	😀 very clean, nice and calm environment 
-	🏡 private balcony 
-	🚭No smoke 
-	🍾No party
-	🐶No pet
-	📍the room has a great view, quiet, comfy and privacy.
-	Please kindly send me chat 480$ per week included bills.💕
-	Summary:
-	Master room available in Sydney Olympic Park for a minimum stay of 3-6 months. Price is $480/week and bond is 2 weeks. All bills included.
-	Own bathroom, 2 wardrobes, comfortable new bed, study desk, and private balcony. Close to IGA, bus stop, and train station.
-	No smoking, no pets, no parties. Beautiful park nearby.
 
 	Post:
 	{{.post}}
