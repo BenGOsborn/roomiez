@@ -46,6 +46,13 @@ resource "aws_api_gateway_integration" "rentals_post_lambda_integration" {
   uri                     = aws_lambda_function.process_rental_lambda.invoke_arn
 }
 
+# Queue
+
+resource "aws_sqs_queue" "rental_queue" {
+  name                       = "rental-queue"
+  visibility_timeout_seconds = 60
+}
+
 # Lambda
 
 resource "aws_lambda_function" "retrieve_rentals_lambda" {
@@ -65,12 +72,29 @@ resource "aws_lambda_function" "retrieve_rentals_lambda" {
   }
 }
 
-resource "aws_lambda_function" "process_rental_lambda" {
-  function_name    = "process-rentals"
-  role             = aws_iam_role.process_rental_lambda_role.arn
+resource "aws_lambda_function" "process_rental_enqueue_lambda" {
+  function_name    = "process-rental-enqueue"
+  role             = aws_iam_role.process_rental_enqueue_lambda_role.arn
   handler          = "main"
   runtime          = "go1.x"
   timeout          = 30
+  filename         = "process_rental_enqueue.zip"
+  source_code_hash = filebase64sha256("process_rental_enqueue.zip")
+
+  environment {
+    variables = {
+      ENV     = "production"
+      SQS_URL = aws_sqs_queue.rental_queue.id
+    }
+  }
+}
+
+resource "aws_lambda_function" "process_rental_lambda" {
+  function_name    = "process-rental"
+  role             = aws_iam_role.process_rental_lambda_role.arn
+  handler          = "main"
+  runtime          = "go1.x"
+  timeout          = 60
   filename         = "process_rental.zip"
   source_code_hash = filebase64sha256("process_rental.zip")
 
@@ -92,12 +116,18 @@ resource "aws_lambda_permission" "apigw_retrieve_rentals_lambda_permission" {
   source_arn    = "${aws_api_gateway_rest_api.rest_api.execution_arn}/*/${aws_api_gateway_method.rentals_get_method.http_method}${aws_api_gateway_resource.rentals_resource.path}"
 }
 
-resource "aws_lambda_permission" "apigw_process_rental_lambda_permission" {
+resource "aws_lambda_permission" "apigw_process_rental_enqueue_lambda_permission" {
   statement_id  = "AllowAPIGatewayInvoke"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.process_rental_lambda.function_name
+  function_name = aws_lambda_function.process_rental_enqueue_lambda.function_name
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_api_gateway_rest_api.rest_api.execution_arn}/*/${aws_api_gateway_method.rentals_post_method.http_method}${aws_api_gateway_resource.rentals_resource.path}"
+}
+
+resource "aws_lambda_event_source_mapping" "process_rental_sqs_mapping" {
+  event_source_arn = aws_sqs_queue.rental_queue.arn
+  function_name    = aws_lambda_function.process_rental_lambda.function_name
+  batch_size       = 1
 }
 
 # Roles
@@ -136,6 +166,35 @@ resource "aws_iam_role_policy_attachment" "retrieve_rentals_lambda_location_poli
   policy_arn = aws_iam_policy.location_policy.arn
 }
 
+resource "aws_iam_role" "process_rental_enqueue_lambda_role" {
+  name = "process-rental-enqueue-lambda-role"
+
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "lambda.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "process_rental_enqueue_lambda_basic" {
+  role       = aws_iam_role.process_rental_enqueue_lambda_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+resource "aws_iam_role_policy_attachment" "process_rental_enqueue_lambda_sqs" {
+  role       = aws_iam_role.process_rental_enqueue_lambda_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSQSFullAccess"
+}
+
 resource "aws_iam_role" "process_rental_lambda_role" {
   name = "process-rental-lambda-role"
 
@@ -168,4 +227,9 @@ resource "aws_iam_role_policy_attachment" "process_rental_lambda_secrets_manager
 resource "aws_iam_role_policy_attachment" "process_rental_lambda_location" {
   role       = aws_iam_role.process_rental_lambda_role.name
   policy_arn = aws_iam_policy.location_policy.arn
+}
+
+resource "aws_iam_role_policy_attachment" "process_rental_lambda_sqs" {
+  role       = aws_iam_role.process_rental_lambda_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSQSFullAccess"
 }

@@ -10,7 +10,7 @@ resource "aws_cloudwatch_event_target" "schedule" {
   arn  = aws_lambda_function.schedule_email_lambda.arn
 }
 
-# SQS
+# Queue
 
 resource "aws_sqs_queue" "email_queue" {
   name                       = "email-queue"

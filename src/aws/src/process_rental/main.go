@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"log"
-	"net/http"
 	"os"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -21,7 +20,7 @@ type Body struct {
 	URL  string `json:"url"`
 }
 
-func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
+func HandleRequest(ctx context.Context, sqsEvent events.SQSEvent) error {
 	// Load requirements
 	logger := log.New(os.Stdout, "[ProcessRental] ", log.Ldate|log.Ltime)
 
@@ -29,62 +28,57 @@ func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 	if err != nil {
 		logger.Println(err)
 
-		return nil, err
+		return err
 	}
 
 	db, err := gorm.Open(mysql.Open(env.DSN))
 	if err != nil {
 		logger.Println(err)
 
-		return nil, err
+		return err
 	}
 
 	llm, err := openai.NewChat(openai.WithModel("gpt-4"), openai.WithToken(env.OpenAIAPIKey))
 	if err != nil {
 		logger.Println(err)
 
-		return nil, err
+		return err
 	}
 
 	// Process the post and ensure no duplicates
-	body := &Body{}
-	if err := json.Unmarshal([]byte(request.Body), body); err != nil {
-		logger.Println(err)
+	for _, message := range sqsEvent.Records {
+		body := &Body{}
+		if err := json.Unmarshal([]byte(message.Body), body); err != nil {
+			logger.Println(err)
 
-		return nil, err
+			return err
+		}
+
+		if err := db.Where("url = ?", body.URL).First(&utils.Rental{}).Error; err == nil {
+			err = errors.New("post already exists")
+			logger.Println(err)
+
+			return err
+		}
+
+		rental, err := utils.ProcessPost(ctx, llm, body.Post)
+		if err != nil {
+			logger.Println(err)
+
+			return err
+		}
+
+		// Save the post
+		if err := utils.SaveRental(ctx, db, rental, body.URL, env.AWSLocationPlaceIndex); err != nil {
+			logger.Println(err)
+
+			return err
+		}
+
+		logger.Println("processed ", body.URL)
 	}
 
-	if err := db.Where("url = ?", body.URL).First(&utils.Rental{}).Error; err == nil {
-		err = errors.New("post already exists")
-		logger.Println(err)
-
-		return nil, err
-	}
-
-	rental, err := utils.ProcessPost(ctx, llm, body.Post)
-	if err != nil {
-		logger.Println(err)
-
-		return nil, err
-	}
-
-	// Save the post
-	if err := utils.SaveRental(ctx, db, rental, body.URL, env.AWSLocationPlaceIndex); err != nil {
-		logger.Println(err)
-
-		return nil, err
-	}
-
-	logger.Println("OK")
-
-	return &events.APIGatewayProxyResponse{
-		StatusCode: http.StatusOK,
-		Headers: map[string]string{
-			"Content-Type":                "text/plain",
-			"Access-Control-Allow-Origin": "*",
-		},
-		Body: "OK",
-	}, nil
+	return nil
 }
 
 func main() {

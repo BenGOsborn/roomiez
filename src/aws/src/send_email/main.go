@@ -83,7 +83,7 @@ func HandleRequest(ctx context.Context, sqsEvent events.SQSEvent) error {
 			return err
 		}
 
-		logger.Println("sent email to", record.ID)
+		logger.Println("sent email to ", record.ID)
 	}
 
 	return nil
