@@ -1,38 +1,40 @@
 import { useEffect, useState } from "react"
 
 const API_KEY_KEY = "API_KEY"
-const SEEN_KEY = "SEEN"
+const API_BASE_URL_KEY = "API_BASE_URL"
 
 export default function Index() {
   const [key, setKey] = useState<string>("")
-  const [seen, setSeen] = useState<string[]>([])
+  const [apiBaseUrl, setApiBaseUrl] = useState<string>("")
+
+  const [loaded, setLoaded] = useState<boolean>(false)
 
   useEffect(() => {
-    const _seen = localStorage.getItem(SEEN_KEY)
-    if (_seen) setKey(_seen)
-  }, [setSeen])
+    const _apiBaseUrl = localStorage.getItem(API_BASE_URL_KEY)
+    if (_apiBaseUrl) setApiBaseUrl(_apiBaseUrl)
 
-  useEffect(() => {
-    localStorage.setItem(SEEN_KEY, JSON.stringify(seen))
-  }, [seen])
-
-  useEffect(() => {
     const _key = localStorage.getItem(API_KEY_KEY)
     if (_key) setKey(_key)
-  }, [setKey])
+
+    setLoaded(true)
+  }, [setApiBaseUrl, setKey, setLoaded])
 
   useEffect(() => {
+    if (!loaded) return
+
+    localStorage.setItem(API_BASE_URL_KEY, apiBaseUrl)
     localStorage.setItem(API_KEY_KEY, key)
-  }, [key])
+  }, [loaded, apiBaseUrl, key])
 
   async function onClick() {
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-      chrome.tabs.sendMessage(tabs[0].id, { key, seen }, (resp) => setSeen(resp.seen))
+      chrome.tabs.sendMessage(tabs[0].id, { key, apiBaseUrl })
     })
   }
 
   return (
     <div>
+      <input type="text" value={apiBaseUrl} onChange={(e) => setApiBaseUrl(e.target.value)} />
       <input type="password" value={key} onChange={(e) => setKey(e.target.value)} />
       <button onClick={onClick}>Click</button>
     </div>
