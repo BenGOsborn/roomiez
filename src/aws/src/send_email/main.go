@@ -46,7 +46,7 @@ func HandleRequest(ctx context.Context, sqsEvent events.SQSEvent) error {
 		if err := json.Unmarshal([]byte(message.Body), record); err != nil {
 			logger.Println(err)
 
-			continue
+			return err
 		}
 
 		from := mail.NewEmail("Roomiez", "rentals@roomiez.co")
@@ -60,11 +60,11 @@ func HandleRequest(ctx context.Context, sqsEvent events.SQSEvent) error {
 		if err != nil {
 			logger.Println(err)
 
-			continue
+			return err
 		} else if len(*rentals) < 4 {
 			logger.Println("not enough rentals found")
 
-			continue
+			return err
 		}
 
 		for i := 0; i < 4; i++ {
@@ -80,7 +80,7 @@ func HandleRequest(ctx context.Context, sqsEvent events.SQSEvent) error {
 		if _, err := client.Send(email); err != nil {
 			logger.Println(err)
 
-			continue
+			return err
 		}
 
 		logger.Println("sent email to", record.ID)
