@@ -175,12 +175,12 @@ func SaveRental(ctx context.Context, db *gorm.DB, rental *RentalSchema, url stri
 	}
 
 	if len(*rental.Features) > 0 {
-		existingFeatures := []Feature{}
-		if err := db.Find(&existingFeatures, "name IN ?", rental.Features).Error; err != nil {
+		existingFeatures := &[]Feature{}
+		if err := db.Find(existingFeatures, "name IN ?", *rental.Features).Error; err != nil {
 			return err
 		}
 
-		newRental.Features = append(newRental.Features, existingFeatures...)
+		newRental.Features = append(newRental.Features, *existingFeatures...)
 	}
 
 	return db.Create(newRental).Error
