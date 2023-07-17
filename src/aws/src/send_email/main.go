@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -38,8 +39,6 @@ func HandleRequest(ctx context.Context, sqsEvent events.SQSEvent) error {
 		return err
 	}
 
-	// TODO add DLQ
-
 	for _, message := range sqsEvent.Records {
 		record := &utils.SubscriptionRecord{}
 
@@ -71,13 +70,20 @@ func HandleRequest(ctx context.Context, sqsEvent events.SQSEvent) error {
 			body := fmt.Sprint("property_", i+1)
 			url := fmt.Sprint("url_", i+1)
 
-			email.Personalizations[0].SetSubstitution(body, (*rentals)[i].Description)
-			email.Personalizations[0].SetSubstitution(url, (*rentals)[i].URL)
+			email.Personalizations[0].SetDynamicTemplateData(body, (*rentals)[i].Description)
+			email.Personalizations[0].SetDynamicTemplateData(url, (*rentals)[i].URL)
 		}
 
-		email.Personalizations[0].SetSubstitution("unsubscribe", fmt.Sprint(unsubscribeUrl, "?id=", record.ID))
+		email.Personalizations[0].SetDynamicTemplateData("unsubscribe", fmt.Sprint(unsubscribeUrl, "?id=", record.ID))
 
-		if _, err := client.Send(email); err != nil {
+		resp, err := client.Send(email)
+		if err != nil {
+			logger.Println(err)
+
+			return err
+		} else if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+			err = errors.New(fmt.Sprint("bad response ", resp.StatusCode, " ", resp.Body))
+
 			logger.Println(err)
 
 			return err
