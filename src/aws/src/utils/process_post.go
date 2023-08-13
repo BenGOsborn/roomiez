@@ -52,7 +52,7 @@ func ProcessPost(ctx context.Context, llm *openai.Chat, post string) (*RentalSch
 	if err != nil {
 		return nil, err
 	} else if validation != "yes" {
-		return nil, errors.New("invalid post")
+		return nil, nil
 	}
 
 	extractionChain := NewPostExtraction(llm)

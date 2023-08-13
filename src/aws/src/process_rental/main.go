@@ -66,6 +66,10 @@ func HandleRequest(ctx context.Context, sqsEvent events.SQSEvent) error {
 			logger.Println(err)
 
 			return err
+		} else if rental == nil {
+			logger.Println("processed ", body.URL)
+
+			continue
 		}
 
 		// Save the post

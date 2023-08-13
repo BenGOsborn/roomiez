@@ -59,7 +59,7 @@ func TestProcessPost(t *testing.T) {
 		P.S: The property was offered unfurnished. We have some furniture, including a sofa, kitchen appliances, and a TV. You are welcome to bring your own furniture or contribute towards getting any additional items needed.`
 
 		if _, err := utils.ProcessPost(ctx, llm, post); err != nil {
-			t.Error(err)
+			t.Error("invalid")
 		}
 	})
 
@@ -68,8 +68,8 @@ func TestProcessPost(t *testing.T) {
 		We have a good realtor as a reference. We are tidy, clean and not party people.
 		Please DM me if you have one for long term rent.`
 
-		if _, err := utils.ProcessPost(ctx, llm, post); err == nil {
-			t.Error(err)
+		if val, _ := utils.ProcessPost(ctx, llm, post); val != nil {
+			t.Error("post should not be processed")
 		}
 	})
 
