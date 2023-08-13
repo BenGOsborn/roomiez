@@ -10,14 +10,6 @@ resource "aws_cloudwatch_event_target" "schedule" {
   arn  = aws_lambda_function.schedule_email_lambda.arn
 }
 
-resource "aws_lambda_permission" "allow_cloudwatch" {
-  statement_id  = "AllowExecutionFromCloudWatch"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.schedule_email_lambda.arn
-  principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.weekly_email.arn
-}
-
 # Queue
 
 resource "aws_sqs_queue" "email_queue" {
@@ -69,6 +61,14 @@ resource "aws_lambda_event_source_mapping" "send_email_sqs_mapping" {
   event_source_arn = aws_sqs_queue.email_queue.arn
   function_name    = aws_lambda_function.send_email_lambda.function_name
   batch_size       = 1
+}
+
+resource "aws_lambda_permission" "allow_cloudwatch" {
+  statement_id  = "AllowExecutionFromCloudWatch"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.schedule_email_lambda.arn
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.weekly_email.arn
 }
 
 # Roles
